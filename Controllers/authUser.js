@@ -11,8 +11,8 @@ const register = async (req, res) => {
     try {
         const { firstName, lastName, country, role, phoneNumber, eMail, password } = req.body;
 
-        const mailExists = await pool.query('SELECT * FROM Users WHERE eMail = ?' , eMail);
-        if (mailExists) {
+        const [rows] = await pool.query('SELECT 1 FROM Users WHERE eMail = ?', [eMail]);
+        if (rows.length > 0) {
             return res.status(StatusCodes.BAD_REQUEST).json({ error: 'E-mail already exists' });
         }
 
