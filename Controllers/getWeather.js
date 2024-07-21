@@ -31,7 +31,9 @@ const getWeatherData = async (req , res) => {
         // Extract weather conditions
         const { temperature, humidity, precipitationProbability } = data.data.values;
 
-        // Update the barage_table with the fetched weather data
+        // Update the Weather_Data table with the fetched weather data
+        const deletesql = `DELETE FROM Weather_Data WHERE soil_id = ?`;
+        await pool.query(deletesql, [soil_id]);
         const sql = `INSERT INTO Weather_Data (temperature, humidity, rainfall, soil_id) VALUES (?, ?, ?, ?)`;
         await pool.query(sql, [temperature, humidity, precipitationProbability, soil_id]);
 
