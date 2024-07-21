@@ -4,15 +4,15 @@ import pool from '../DB/connect.js';
 
 const addSoilData = async (req, res) => {
 
-    const { latitude, longitude, land_size, pH_level, nutrient_content, porosity, oxygen_level } = req.body;
+    const { latitude, longitude, land_size, ph_level, nitrogen, phosphorus, potassium, porosity, oxygen_level } = req.body;
     const user_id = req.user.id;
 
-    const sql = `INSERT INTO Soil_Data (latitude, longitude, land_size, pH_level, nutrient_content, porosity, oxygen_level, user_id)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO Soil_Data (latitude, longitude, land_size, ph_level, nitrogen, phosphorus, potassium, porosity, oxygen_level, user_id)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     try {
 
-      await pool.query(sql, [latitude, longitude, land_size, pH_level, nutrient_content, porosity, oxygen_level, user_id]);
+      await pool.query(sql, [latitude, longitude, land_size, ph_level, nitrogen, phosphorus, potassium, porosity, oxygen_level, user_id]);
       res.status(StatusCodes.CREATED).json({ message: 'Soil data added successfully' });
 
     } catch (error) {

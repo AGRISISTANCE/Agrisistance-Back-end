@@ -5,6 +5,6 @@ import authenticateUser from '../Middleware/authMiddleware.js';
 const router = express.Router();
 
 // Route to add weather data
-router.post('/predict', /*authenticateUser,*/ predict);
+router.get('/predict', authenticateUser, predict);
 
 export default router;
