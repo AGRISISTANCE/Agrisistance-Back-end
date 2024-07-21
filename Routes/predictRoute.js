@@ -1,9 +1,10 @@
 import express from 'express';
-import UploadPFP from '../Controllers/uploadPFP.js';
+import predict from '../Controllers/predict.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.put('/upload-pfp', authenticateUser, UploadPFP);
+// Route to add weather data
+router.post('/predict', /*authenticateUser,*/ predict);
 
 export default router;

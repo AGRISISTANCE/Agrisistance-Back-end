@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
+import axios from 'axios';
+
 import 'express-async-errors';
 
 import notFoundMiddleware from './Middleware/not-found.js';

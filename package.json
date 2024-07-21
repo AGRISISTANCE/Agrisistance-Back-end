@@ -6,6 +6,7 @@
   "main": "server.js",
   "dependencies": {
     "@api/climacell-docs": "file:.api/apis/climacell-docs",
+    "@tensorflow/tfjs-node": "^4.20.0",
     "accepts": "^1.3.8",
     "anymatch": "^3.1.3",
     "append-field": "^1.0.0",
@@ -131,6 +132,7 @@
     "statuses": "^2.0.1",
     "streamsearch": "^1.1.0",
     "string_decoder": "^1.1.1",
+    "stripe": "^16.2.0",
     "supports-color": "^5.5.0",
     "to-regex-range": "^5.0.1",
     "toidentifier": "^1.0.1",

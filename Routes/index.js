@@ -8,6 +8,7 @@ import AddPestData from '../Routes/addPestDataRoute.js';
 import addYiledPrediction from './addYieldPredictionRoute.js';
 import addFinancialData from './addFinancialDataRoute.js';
 import getWeatherData from '../Routes/getWeatherRoute.js';
+import predict from './predictRoute.js';
 const router = express.Router();
 
 
@@ -20,5 +21,6 @@ router.use('/pest', AddPestData);
 router.use('/yield', addYiledPrediction);
 router.use('/financial', addFinancialData);
 router.use('/weather', getWeatherData);
+router.use('/model', predict);
 
 export default router;

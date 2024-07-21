@@ -1,6 +1,7 @@
 # Node.js dependency directories
 node_modules/
 
+
 # Logs
 logs/
 *.log
