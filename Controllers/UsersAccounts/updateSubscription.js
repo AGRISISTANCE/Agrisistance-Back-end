@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -20,6 +20,7 @@ const UpdateSubscription = async (req, res) => {
     try {
 
         // Create a payment intent
+        /*
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: 'usd',
@@ -32,11 +33,13 @@ const UpdateSubscription = async (req, res) => {
             confirm: true,
         });
 
+        */
+
         // Update the subscription type in the database
         await pool.query(`UPDATE Users SET subscription_type = ? WHERE user_id = ?`, [subscription_type, user_id]);
 
         // Send the response
-        res.status(StatusCodes.OK).json({ message: 'Subscription updated successfully', paymentIntent });
+        res.status(StatusCodes.OK).json({ message: 'Subscription updated successfully'/*, paymentIntent*/ });
         
     } catch (error) {
         console.error(error);

@@ -1,28 +1,38 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
+import sendConfirmationEmail from '../../Util/EmailConfirmation/sendConfirmationEmail.js';
 
 dotenv.config();
 
 const register = async (req, res) => {
+
     try {
+
         const { firstName, lastName, country, role, phoneNumber, eMail, password } = req.body;
 
+        // Check if the e-mail already exists
         const [rows] = await pool.query('SELECT 1 FROM Users WHERE eMail = ?', [eMail]);
         if (rows.length > 0) {
             return res.status(StatusCodes.BAD_REQUEST).json({ error: 'E-mail already exists' });
         }
 
+        // Hash the password and generate a user_id
         const hashedPassword = await bcrypt.hash(password, 10);
         const user_id = uuidv4();
+    
+        // Insert the user into the database
+        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, phoneNumber, eMail, password, subscription_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword , 'Basic']);
 
-        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, phoneNumber, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword]);
+        // Create a token
+        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
-        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+        // Send confirmation email
+        await sendConfirmationEmail(eMail);
 
         res.status(StatusCodes.CREATED).json({         
                 token,
@@ -49,7 +59,7 @@ const login = async (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid password' });
         }
 
-        const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+        const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
         return res.status(StatusCodes.OK).json({
             token,

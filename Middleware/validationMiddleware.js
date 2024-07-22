@@ -8,7 +8,7 @@ const validateRequest = (validations) => {
     if (errors.isEmpty()) {
       return next();
     }
-    res.status(400).json({ error : errors.array()[0].msg});
+    res.status(400).json({ error: errors.array()[0].msg });
   };
 };
 
@@ -27,14 +27,25 @@ const validateRegister = [
   body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Phone number must be in the correct international format'),
 ];
 
-
 const validateLogin = [
   body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required')
 ];
 
+const validateUploadPFP = [
+  body('profile_picture').notEmpty().withMessage('Profile picture is required')
+    .matches(/^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/).withMessage('Invalid profile picture format')
+];
+
+const validateUpdateSubscriptionType = [
+  body('subscription_type').isIn(['Premium', 'Basic']).withMessage('Subscription type must be either Premium or Basic'),
+  body('payment_method_id').matches(/^pm_[a-zA-Z0-9_]+$/).withMessage('Invalid payment method ID format')
+];
+
 export { 
   validateRequest,
   validateRegister,
-  validateLogin
+  validateLogin,
+  validateUploadPFP,
+  validateUpdateSubscriptionType
 };

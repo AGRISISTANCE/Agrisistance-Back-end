@@ -116,6 +116,6 @@ removeVersions.js
 scripts/removeVersions.js
 
 # Ignore any other files that you specifically want to ignore
-Util/Evaluation/*.js
+
 # important-files
 schema.sql

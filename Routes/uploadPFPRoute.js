@@ -1,5 +1,5 @@
 import express from 'express';
-import UploadPFP from '../Controllers/uploadPFP.js';
+import UploadPFP from '../Controllers/UsersAccounts/uploadPFP.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
