@@ -18,7 +18,7 @@ oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 
 
-const sendConfirmationEmail = async (email) => {
+const sendConfirmationEmail = async (email, token) => {
   try {
 
     const accessToken = await oAuth2Client.getAccessToken();
@@ -35,9 +35,12 @@ const sendConfirmationEmail = async (email) => {
       },
     });
 
+
+    
+
     const emailTemplatePath = path.join(__dirname, 'emailTemplate.html');
     const emailTemplate = fs.readFileSync(emailTemplatePath, 'utf-8');
-    const emailHtml = emailTemplate.replace('verification_link', `https://www.youtube.com/watch?v=dQw4w9WgXcQ`);
+    const emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
 
 
     const mailOptions = {

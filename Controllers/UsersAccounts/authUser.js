@@ -25,14 +25,19 @@ const register = async (req, res) => {
         const user_id = uuidv4();
     
         // Insert the user into the database
-        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, phoneNumber, eMail, password, subscription_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword , 'Basic']);
+        // User's remaining fields are set to their default values by MYSQL (e.g., isVerified = 0 , profile_picture = predefined default image , subscription_type = Basic)
+        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, phoneNumber, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword]);
 
         // Create a token
         const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
         // Send confirmation email
-        await sendConfirmationEmail(eMail);
+        await sendConfirmationEmail(eMail, token);
+
+        // Then the user gonna verify the email and the account will be activated from another link in the email
+        //which we will not be doing here since we are testing for the moment
+        await pool.query('UPDATE Users SET isVerified = 1 WHERE user_id = ?', [user_id]);
 
         res.status(StatusCodes.CREATED).json({         
                 token,
@@ -52,6 +57,10 @@ const login = async (req, res) => {
 
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email' });
+        }
+        
+        if (!user.isVerified) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
 
         const isCorrectPassword = await bcrypt.compare(password, user.password);

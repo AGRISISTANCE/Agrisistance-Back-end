@@ -30,7 +30,7 @@ const UploadPFP = async (req, res) => {
             }
         }
 
-        const uploadResult = await cloudinary.uploader.upload(profile_picture, { folder: 'Users-Profile-Pictures' });
+        const uploadResult = await cloudinary.uploader.upload(profile_picture, { folder: 'Agrisistance/Users-Profile-Pictures' });
         await pool.query('UPDATE Users SET profile_picture = ? WHERE user_id = ?', [uploadResult.secure_url, user_id]);
 
         res.status(StatusCodes.OK).json({ message: 'Profile picture uploaded successfully' });

@@ -9,14 +9,18 @@ import addYiledPrediction from './addYieldPredictionRoute.js';
 import addFinancialData from './addFinancialDataRoute.js';
 import getWeatherData from '../Routes/getWeatherRoute.js';
 import predict from './predictRoute.js';
+import verifyUserEmail from './verifyUserEmailRoute.js';
+
 const router = express.Router();
 
 
 
 router.use('/user', authUsereRoute);
-router.use('/soil', addtSoilData);
+router.use('/user', verifyUserEmail);
 router.use('/user', UpdateSubscription);
 router.use('/user', UploadPFP);
+
+router.use('/soil', addtSoilData);
 router.use('/pest', AddPestData);   
 router.use('/yield', addYiledPrediction);
 router.use('/financial', addFinancialData);

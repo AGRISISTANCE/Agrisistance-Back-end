@@ -9,7 +9,7 @@ cloudinary.config({
 
 const deleteImageFromCloudinary = async (publicId, resourceType) => {
     try {
-        const result = await cloudinary.api.delete_resources([`${resourceType}/${publicId}`], { type: 'upload', resource_type: 'image' });
+        const result = await cloudinary.api.delete_resources([`Agrisistance/${resourceType}/${publicId}`], { type: 'upload', resource_type: 'image' });
         console.log(`Deleted ${resourceType} with public_id ${publicId}`);
     } catch (error) {
         console.error(`Error deleting ${resourceType} with public_id ${publicId}:`, error.message );
