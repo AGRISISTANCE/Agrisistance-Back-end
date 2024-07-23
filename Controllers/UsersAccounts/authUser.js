@@ -30,18 +30,13 @@ const register = async (req, res) => {
         await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword]);
 
         // Create a token
-        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
 
         // Send confirmation email
         await sendConfirmationEmail(eMail, token);
 
-        // Then the user gonna verify the email and the account will be activated from another link in the email
-        //which we will not be doing here since we are testing for the moment
-        await pool.query('UPDATE Users SET isVerified = 1 WHERE user_id = ?', [user_id]);
-
-        res.status(StatusCodes.CREATED).json({         
-                token,
-        });
+        res.status(StatusCodes.CREATED).json({ message: 'User created successfully please verify your account via the link sent by Email' });
+    
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
@@ -58,14 +53,14 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email' });
         }
-        
-        if (!user.isVerified) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
-        }
 
         const isCorrectPassword = await bcrypt.compare(password, user.password);
         if (!isCorrectPassword) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid password' });
+        }
+
+        if (!user.isVerified) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
 
         const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });

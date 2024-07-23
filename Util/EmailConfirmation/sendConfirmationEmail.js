@@ -36,7 +36,7 @@ const sendConfirmationEmail = async (email, token) => {
     });
 
 
-    
+
 
     const emailTemplatePath = path.join(__dirname, 'emailTemplate.html');
     const emailTemplate = fs.readFileSync(emailTemplatePath, 'utf-8');
@@ -59,3 +59,44 @@ const sendConfirmationEmail = async (email, token) => {
 };
 
 export default sendConfirmationEmail;
+
+
+
+// Second way to implement the same functionality 
+
+// import SMTPClient from 'emailjs';
+
+// const sendConfirmationEmail = async (email, token) => {
+
+//   try {
+//     const client = new SMTPClient.SMTPClient({
+//       user: process.env.EMAIL_USER,
+//       password: process.env.EMAIL_PASSWORD,
+//       host: 'smtp.gmail.com',
+//       ssl: true,
+//     });
+
+//     const message = await client.sendAsync ({
+//       text: `Click the following link to verify your email: http://localhost:8081/api/user/register/verify/${token}`,
+//       from: process.env.EMAIL_USER,
+//       to: email,
+//       subject: 'Email Confirmation',
+//       attachment: [
+//          { data: '<html>i <i>hope</i> this works!</html>', alternative: true },
+//          { path: 'path/to/file.zip', type: 'application/zip', name: 'renamed.zip' },
+//       ],
+//     });
+
+//     console.log(message);
+
+//   } catch (error) {
+//     console.error('Error sending confirmation email:', error);
+//     throw new Error('Failed to send confirmation email');
+//   }
+
+// };
+
+// export default sendConfirmationEmail;
+
+
+
