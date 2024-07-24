@@ -4,9 +4,24 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// E-mail type
+const emailTemplates = {
+  confirmation: 'confirmationEmail.html',
+  deletion: 'deletionEmail.html',
+  successdeletion: 'successDeletionEmail.html'
+};
+
+const emailObjects = {
+  confirmation: 'Email Confirmation',
+  deletion: 'Account Deletion Request',
+  successdeletion: 'Account Deleted'
+}
+
 
 // Load environment variables
 const oAuth2Client = new google.auth.OAuth2(
@@ -17,10 +32,8 @@ const oAuth2Client = new google.auth.OAuth2(
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 
-
-const sendConfirmationEmail = async (email, token) => {
+const sendEmail = async (email, token, type) => {
   try {
-
     const accessToken = await oAuth2Client.getAccessToken();
 
     const transporter = nodemailer.createTransport({
@@ -36,17 +49,19 @@ const sendConfirmationEmail = async (email, token) => {
     });
 
 
+    
+    const emailTemplateFile = emailTemplates[type];
+    const emailObject = emailObjects[type];
 
-
-    const emailTemplatePath = path.join(__dirname, 'emailTemplate.html');
+    // Adjust the path to the email template
+    const emailTemplatePath = path.join(__dirname, 'Emails', emailTemplateFile);
     const emailTemplate = fs.readFileSync(emailTemplatePath, 'utf-8');
     const emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
-
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Email Confirmation',
+      subject: emailObject,
       html: emailHtml,
     };
 
@@ -58,7 +73,8 @@ const sendConfirmationEmail = async (email, token) => {
   }
 };
 
-export default sendConfirmationEmail;
+export default sendEmail;
+
 
 
 
@@ -66,7 +82,7 @@ export default sendConfirmationEmail;
 
 // import SMTPClient from 'emailjs';
 
-// const sendConfirmationEmail = async (email, token) => {
+// const sendEmail = async (email, token) => {
 
 //   try {
 //     const client = new SMTPClient.SMTPClient({
@@ -96,7 +112,7 @@ export default sendConfirmationEmail;
 
 // };
 
-// export default sendConfirmationEmail;
+// export default sendEmail;
 
 
 

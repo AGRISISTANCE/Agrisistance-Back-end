@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
-import sendConfirmationEmail from '../../Util/EmailConfirmation/sendConfirmationEmail.js';
+import sendEmail from './Utils/sendEmail.js';
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ const register = async (req, res) => {
         const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
 
         // Send confirmation email
-        await sendConfirmationEmail(eMail, token);
+        await sendEmail(eMail, token, 'confirmation');
 
         res.status(StatusCodes.CREATED).json({ message: 'User created successfully please verify your account via the link sent by Email' });
     
@@ -59,9 +59,14 @@ const login = async (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid password' });
         }
 
-        if (!user.isVerified) {
+        if (user.isVerified === 'FALSE') {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
+
+        // Set last login and remove deletion request if exists
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user.user_id]);
 
         const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 

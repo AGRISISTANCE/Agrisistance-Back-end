@@ -2,7 +2,7 @@ import pool from '../../DB/connect.js';
 import { StatusCodes } from 'http-status-codes';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
-import { extractPublicId, deleteImageFromCloudinary } from '../../Util/cloudinaryDelete.js';
+import { extractPublicId, deleteImageFromCloudinary } from './Utils/cloudinaryDelete.js';
 
 dotenv.config();
 
