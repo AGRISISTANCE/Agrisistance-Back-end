@@ -74,12 +74,23 @@ const login = async (req, res) => {
         const date = new Date(currentTimestamp);
         await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user.user_id]);
 
-        // Generate OTP
+        if (user.is_2fa_enabled === 'FALSE'){
+
+            const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+
+            return res.status(StatusCodes.OK).json({
+                msg : "Logged in successfully !",
+                token,
+            })
+        }
+
+
+        // Generate OTP in case is_2fa_enabled === 'TRUE'
         const randomNumber = Math.floor(Math.random() * 10000);
         randomNumbers[user.user_id] = randomNumber;
 
         // Send the SMS Text
-        /*
+        
         await client.messages.create({
             body: `Dear User,
 
@@ -91,7 +102,7 @@ const login = async (req, res) => {
 
               to: user.phoneNumber
         }).then(message => console.log(message.sid));
-        */
+        
         console.log(`Generated number for : ${randomNumber}`);
 
         const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
@@ -100,6 +111,9 @@ const login = async (req, res) => {
             msg : "number generated",
             token,
         });
+
+
+
     } catch (error) {
         console.error('Error during login:', error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
