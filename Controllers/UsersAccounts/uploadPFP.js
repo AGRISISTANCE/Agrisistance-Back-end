@@ -33,6 +33,11 @@ const UploadPFP = async (req, res) => {
         const uploadResult = await cloudinary.uploader.upload(profile_picture, { folder: 'Agrisistance/Users-Profile-Pictures' });
         await pool.query('UPDATE Users SET profile_picture = ? WHERE user_id = ?', [uploadResult.secure_url, user_id]);
 
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Upload Profile Picture', date]);
+
         res.status(StatusCodes.OK).json({ message: 'Profile picture uploaded successfully' });
     } catch (error) {
         console.error(error);

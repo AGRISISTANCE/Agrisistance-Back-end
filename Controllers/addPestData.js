@@ -9,6 +9,11 @@ const AddPestData = async (req, res) => {
         
         const sql = `INSERT INTO Pest_Data (species, infestation_level, soil_id) VALUES (?, ?, ?)`;
         await pool.query(sql, [species, infestation_level, soil_id]);
+       
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Add Pest Data', date]);
 
         res.status(StatusCodes.CREATED).json({ message: 'Pest data added successfully' });
     } catch (error) {

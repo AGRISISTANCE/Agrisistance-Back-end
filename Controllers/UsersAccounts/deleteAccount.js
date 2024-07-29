@@ -19,6 +19,9 @@ const deleteAccount = async (req, res) => {
         
         await sendEmail(email[0].eMail , '', 'deletion');    
 
+        // Update History
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Request Account Deletion', date]);
+        
         res.status(StatusCodes.ACCEPTED).json({ message: 'Account deletion request recieved successfully please check you E-mail' });
 
 

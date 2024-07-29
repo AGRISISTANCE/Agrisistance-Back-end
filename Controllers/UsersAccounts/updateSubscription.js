@@ -37,6 +37,11 @@ const UpdateSubscription = async (req, res) => {
 
         // Update the subscription type in the database
         await pool.query(`UPDATE Users SET subscription_type = ? WHERE user_id = ?`, [subscription_type, user_id]);
+        
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Update Subscription', date]);
 
         // Send the response
         res.status(StatusCodes.OK).json({ message: 'Subscription updated successfully'/*, paymentIntent*/ });

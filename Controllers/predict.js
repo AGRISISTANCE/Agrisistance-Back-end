@@ -25,6 +25,9 @@ const predict = async (req, res) => {
     // Send the model inputs to the FastAPI server
     const response = await axios.post('http://localhost:8082/predict', {input: model_inputs});
 
+
+
+
     // Insert the recommendations into the database
     const [rec_result] = await pool.query(`INSERT INTO Recommendations (user_id, soil_id, weather_id) VALUES (?, ?, ?)`,[user_id, soil_id, weather_data.weather_id]);
   
@@ -33,7 +36,14 @@ const predict = async (req, res) => {
     for (const value of cropValues) {
       await pool.query(`INSERT INTO crop_types (crop_type, rec_id) VALUES (?, ?)`, [value[0], rec_result.insertId]);
     }
-    
+
+
+           
+    // Update history
+    const currentTimestamp = Date.now();
+    const date = new Date(currentTimestamp);
+    await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Make Prediction', date]);
+
     // Return the response from the FastAPI server
     res.json(response.data);
 

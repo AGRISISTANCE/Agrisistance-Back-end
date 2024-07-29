@@ -9,6 +9,12 @@ const AddFinancialData = async (req, res) => {
         const sql = `INSERT INTO Financial_Data (user_id, investment_amount, expected_revenue, current_revenue) VALUES (?, ?, ?, ?)`;
         await pool.query(sql, [user_id, investment_amount, expected_revenue, current_revenue]);
 
+        
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Add Financial Data', date]);
+
         res.status(StatusCodes.CREATED).json({ message: 'Financial data added successfully' });
     } catch (error) {
         console.error(error);

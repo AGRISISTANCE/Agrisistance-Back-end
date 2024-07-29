@@ -13,6 +13,12 @@ const addSoilData = async (req, res) => {
     try {
 
       await pool.query(sql, [latitude, longitude, land_size, ph_level, nitrogen, phosphorus, potassium, porosity, oxygen_level, user_id]);
+     
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Add Soil Data', date]);
+
       res.status(StatusCodes.CREATED).json({ message: 'Soil data added successfully' });
 
     } catch (error) {

@@ -7,11 +7,17 @@ const verifyUserEmail = async (req, res) => {
       const token = req.params.token
       const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-      const userId = payload.user_id;
+      const user_id = payload.user_id;
 
-      await pool.query('UPDATE Users SET isVerified = ? WHERE user_id = ?', [ 'TRUE', userId ]);
+      await pool.query('UPDATE Users SET isVerified = ? WHERE user_id = ?', [ 'TRUE', user_id ]);
 
-      const realToken = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '10d' });
+        // Update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Verify E-mail', date]);
+    
+
+      const realToken = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
       return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
 
     } catch (e) {

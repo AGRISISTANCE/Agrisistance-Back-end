@@ -55,6 +55,7 @@ const login = async (req, res) => {
 
         const [rows] = await pool.query('SELECT * FROM Users WHERE email = ?', [email]);
         const user = rows[0];
+        const user_id = user.user_id
 
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email' });
@@ -72,11 +73,14 @@ const login = async (req, res) => {
         // Set last login and remove deletion request if exists
         const currentTimestamp = Date.now();
         const date = new Date(currentTimestamp);
-        await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user.user_id]);
-
+        await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user_id]);
+        
+        // Update History
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Log in Account', date]);
+        
         if (user.is_2fa_enabled === 'FALSE'){
 
-            const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+            const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
             return res.status(StatusCodes.OK).json({
                 msg : "Logged in successfully !",
@@ -87,7 +91,7 @@ const login = async (req, res) => {
 
         // Generate OTP in case is_2fa_enabled === 'TRUE'
         const randomNumber = Math.floor(Math.random() * 10000);
-        randomNumbers[user.user_id] = randomNumber;
+        randomNumbers[user_id] = randomNumber;
 
         // Send the SMS Text
         
@@ -105,7 +109,7 @@ const login = async (req, res) => {
         
         console.log(`Generated number for : ${randomNumber}`);
 
-        const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
 
         return res.status(StatusCodes.OK).json({
             msg : "number generated",
