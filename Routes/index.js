@@ -33,4 +33,5 @@ router.use('/weather', getWeatherData);
 
 router.use('/model', predict);
 
+
 export default router;

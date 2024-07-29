@@ -5,6 +5,12 @@ import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import sendEmail from './Utils/sendEmail.js';
+import randomNumbers from './Utils/randomNumbers.js'
+
+import twilio from 'twilio';
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_API_KEY;
+const client = twilio(accountSid, authToken);
 
 dotenv.config();
 
@@ -68,9 +74,30 @@ const login = async (req, res) => {
         const date = new Date(currentTimestamp);
         await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user.user_id]);
 
-        const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+        // Generate OTP
+        const randomNumber = Math.floor(Math.random() * 10000);
+        randomNumbers[user.user_id] = randomNumber;
+
+        // Send the SMS Text
+        /*
+        await client.messages.create({
+            body: `Dear User,
+
+                    Your A2SV-Agrisistance verification code is ${randomNumber}. Please enter this code in the app/website to verify your account.
+
+                    Thank you.`,
+
+            from: '+19387772642',
+
+              to: user.phoneNumber
+        }).then(message => console.log(message.sid));
+        */
+        console.log(`Generated number for : ${randomNumber}`);
+
+        const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
 
         return res.status(StatusCodes.OK).json({
+            msg : "number generated",
             token,
         });
     } catch (error) {
@@ -79,4 +106,32 @@ const login = async (req, res) => {
     }
 };
 
-export { register, login };
+
+const verifyOTP = async (req, res) => {
+
+    const user_id = req.user.id;
+
+    const number = req.body.number;
+    const correctNumber = randomNumbers[user_id];
+
+    if (typeof correctNumber === 'undefined') {
+        return res.status(StatusCodes.BAD_GATEWAY).send('No number generated for this ID');
+    }
+
+    // Verify OTP
+    if (number === correctNumber) {
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+
+        return res.status(StatusCodes.OK).json({
+            msg : "correct number",
+            token,
+        });
+
+    } else {
+        res.send('Incorrect number');
+    }
+
+    
+};
+
+export { register, login, verifyOTP };
