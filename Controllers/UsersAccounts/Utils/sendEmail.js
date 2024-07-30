@@ -13,13 +13,15 @@ const __dirname = path.dirname(__filename);
 const emailTemplates = {
   confirmation: 'confirmationEmail.html',
   deletion: 'deletionEmail.html',
-  successdeletion: 'successDeletionEmail.html'
+  successdeletion: 'successDeletionEmail.html',
+  OTPverify : 'OTPverifyEmail.html'
 };
 
 const emailObjects = {
   confirmation: 'Email Confirmation',
   deletion: 'Account Deletion Request',
-  successdeletion: 'Account Deleted'
+  successdeletion: 'Account Deleted',
+  OTPverify : '2FA One-Time Password'
 }
 
 
@@ -54,9 +56,16 @@ const sendEmail = async (email, token, type) => {
     const emailObject = emailObjects[type];
 
     // Adjust the path to the email template
-    const emailTemplatePath = path.join(__dirname, 'Emails', emailTemplateFile);
+    const emailTemplatePath = path.join(__dirname, '../Emails', emailTemplateFile);
     const emailTemplate = fs.readFileSync(emailTemplatePath, 'utf-8');
-    const emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
+    var emailHtml = emailTemplate;
+    
+    // Edit E-mails by injection variables
+    if (type === 'confirmation'){
+      emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
+    }else if (type === 'OTPverify'){
+      emailHtml = emailTemplate.replace('{{otp}}', token);
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,

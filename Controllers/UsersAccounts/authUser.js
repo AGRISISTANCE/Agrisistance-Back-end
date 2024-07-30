@@ -78,10 +78,10 @@ const login = async (req, res) => {
         // Update History
         await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Log in Account', date]);
         
+        // Send JWT if no 2FA
         if (user.is_2fa_enabled === 'FALSE'){
 
             const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
-
             return res.status(StatusCodes.OK).json({
                 msg : "Logged in successfully !",
                 token,
@@ -93,23 +93,27 @@ const login = async (req, res) => {
         const randomNumber = Math.floor(Math.random() * 10000);
         randomNumbers[user_id] = randomNumber;
 
-        // Send the SMS Text
+        // Send the SMS Text : This part is commented as it consume credits from my twilio account (it works fine)
         
-        await client.messages.create({
-            body: `Dear User,
+        // await client.messages.create({
+        //     body: `Dear User,
 
-                    Your A2SV-Agrisistance verification code is ${randomNumber}. Please enter this code in the app/website to verify your account.
+        //             Your A2SV-Agrisistance verification code is ${randomNumber}. Please enter this code in the app/website to verify your account.
 
-                    Thank you.`,
+        //             Thank you.`,
 
-            from: '+19387772642',
+        //     from: '+19387772642',
 
-              to: user.phoneNumber
-        }).then(message => console.log(message.sid));
+        //       to: user.phoneNumber
+        // }).then(message => console.log(message.sid));
+
+
+        // Send it via email instead
+        await sendEmail(user.eMail, randomNumber, 'OTPverify');
         
         console.log(`Generated number for : ${randomNumber}`);
 
-        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
 
         return res.status(StatusCodes.OK).json({
             msg : "number generated",

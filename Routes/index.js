@@ -12,6 +12,7 @@ import predict from './predictRoute.js';
 import verifyUserEmail from './verifyUserEmailRoute.js';
 import editProfile from '../Routes/editProfileRoute.js';
 import deleteAccount from '../Routes/deleteAccountRoute.js';
+import sendTermsConditions from '../Routes/sendTermsConditionsRoute.js';
 
 const router = express.Router();
 
@@ -32,6 +33,8 @@ router.use('/financial', addFinancialData);
 router.use('/weather', getWeatherData);
 
 router.use('/model', predict);
+
+router.use(sendTermsConditions);
 
 
 export default router;
