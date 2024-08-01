@@ -18,6 +18,7 @@ const deleteUserAccountsCronJob = async () => {
         }
   
         // Delete the user account
+        
         await pool.query('DELETE FROM Users WHERE user_id = ?', [user.user_id]);
   
         // Send deletion confirmation email

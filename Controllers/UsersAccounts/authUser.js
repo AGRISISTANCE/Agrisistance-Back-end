@@ -8,11 +8,13 @@ import sendEmail from './Utils/sendEmail.js';
 import randomNumbers from './Utils/randomNumbers.js'
 
 import twilio from 'twilio';
+
+dotenv.config();
+
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_API_KEY;
 const client = twilio(accountSid, authToken);
 
-dotenv.config();
 
 const register = async (req, res) => {
 

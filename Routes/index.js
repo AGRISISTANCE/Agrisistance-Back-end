@@ -14,6 +14,7 @@ import editProfile from './editProfileRoute.js';
 import deleteAccount from './deleteAccountRoute.js';
 import sendTermsConditions from './sendTermsConditionsRoute.js';
 import unable2FA from './unable2FARoute.js';
+import completeAccount from './completeAccountRoute.js';
 
 import googleOAuth from './googleOAuthRoute.js';
 
@@ -28,6 +29,7 @@ router.use('/user', UploadPFP);
 router.use('/user', editProfile);
 router.use('/user', deleteAccount);
 router.use('/user', unable2FA);
+router.use('/user', completeAccount);
 
 router.use('/auth/google', googleOAuth);
 
