@@ -74,6 +74,10 @@ const login = async (req, res) => {
         }
 
         if (user.isVerified === 'FALSE') {
+            
+            // Send confirmation email again
+            const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+            await sendEmail(user.eMail, token, 'confirmation');
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
 

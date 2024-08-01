@@ -86,7 +86,7 @@ router.get('/success-auth', async (req, res) => {
     
     try {
         
-        const [rows] = await pool.query('SELECT * FROM Users WHERE user_id = ?', [userProfile.id]);
+        const [rows] = await pool.query('SELECT 1 FROM Users WHERE user_id = ?', [userProfile.id]);
         
         if (rows.length === 0) {
 
@@ -96,12 +96,11 @@ router.get('/success-auth', async (req, res) => {
 
             return res.redirect(`/api/user/complete-account/${userProfile.id}`);
 
-        } else {
-    
-            console.log('Google user already exists in DB.');
-            return login(req, res, userProfile.id);
-    
         }
+
+
+        return login(req, res, userProfile.id);
+    
     
     } catch (error) {
     
@@ -115,8 +114,6 @@ router.get('/success-auth', async (req, res) => {
 
 
 // Error logging in via Google
-router.get('/error', (req, res) => res.send('Error logging in via Google.'));
-
-
+router.get('/error', (req, res) => res.status(StatusCodes.BAD_REQUEST).json({  message :'Error logging in via Google.' }));
 
 export default router;

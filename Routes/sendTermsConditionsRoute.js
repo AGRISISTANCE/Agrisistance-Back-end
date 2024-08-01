@@ -1,5 +1,5 @@
 import express from 'express';
-import sendTermsConditions from '../Controllers/Terms-and-Conditions/sendTermsConditions.js';
+import sendTermsConditions from '../Controllers/sendTermsConditions.js';
 
 
 const router = express.Router();
