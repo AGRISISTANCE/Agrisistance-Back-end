@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
     try {
 
-        const { firstName, lastName, country, role, phoneNumber, eMail, password } = req.body;
+        const { firstName, lastName, country, role, eMail, password } = req.body;
 
         // Check if the e-mail already exists
         const [rows] = await pool.query('SELECT 1 FROM Users WHERE eMail = ?', [eMail]);
@@ -32,14 +32,19 @@ const register = async (req, res) => {
     
         // Insert the user into the database
         // User's remaining fields are set to their default values by MYSQL (e.g., isVerified = 0 , profile_picture = predefined default image , subscription_type = Basic)
-        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, phoneNumber, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        await pool.query(sql, [user_id, firstName, lastName, country, role, phoneNumber, eMail, hashedPassword]);
+        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        await pool.query(sql, [user_id, firstName, lastName, country, role, eMail, hashedPassword]);
 
         // Create a token
         const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
 
         // Send confirmation email
         await sendEmail(eMail, token, 'confirmation');
+        
+        // update history
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Create Account', date]);
 
         res.status(StatusCodes.CREATED).json({ message: 'User created successfully please verify your account via the link sent by Email' });
     
