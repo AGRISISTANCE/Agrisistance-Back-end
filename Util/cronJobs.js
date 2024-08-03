@@ -18,19 +18,19 @@ const deleteUserAccountsCronJob = async () => {
         }
   
         // Delete the user account and his data
-        await pool.query('DELETE FROM history WHERE user_id = ?', [user.user_id]);
-        await pool.query('DELETE FROM financial_data WHERE user_id = ?', [user.user_id]);
-        await pool.query('DELETE FROM yield_predictions WHERE user_id = ?', [user.user_id]);
-       
-        await pool.query('DELETE FROM crop_types WHERE user_id = ?', [user.user_id]);
-        await pool.query('DELETE FROM pest_data WHERE user_id = ?', [user.user_id]);
 
-        await pool.query('DELETE FROM recommendations WHERE user_id = ?', [user.user_id]);
-
-        await pool.query('DELETE FROM weather_data WHERE user_id = ?', [user.user_id]);
-
-        await pool.query('DELETE FROM soil_data WHERE user_id = ?', [user.user_id]);
-        await pool.query('DELETE FROM users WHERE user_id = ?', [user.user_id]);
+        await Promise.all([
+          pool.query('DELETE FROM history WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM financial_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM yield_predictions WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM crop_types WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM pest_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM recommendations WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM weather_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM soil_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM users WHERE user_id = ?', [user.user_id])
+      ]);
+      
 
         // TODO : migrate this data into a new database for Data (create new database for deleted accounts -pool_deleted-)
   

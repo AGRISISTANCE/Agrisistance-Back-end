@@ -21,7 +21,6 @@ import googleOAuth from './googleOAuthRoute.js';
 const router = express.Router();
 
 
-
 router.use('/auth', authUsereRoute);
 router.use('/user', verifyUserEmail);
 router.use('/user', UpdateSubscription);

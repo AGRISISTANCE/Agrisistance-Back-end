@@ -10,6 +10,9 @@ import jwt from 'jsonwebtoken';
 import sendEmail from '../Controllers/UsersAccounts/Utils/sendEmail.js';
 import randomNumbers from '../Controllers/UsersAccounts/Utils/randomNumbers.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import twilio from 'twilio';
 
 dotenv.config();
@@ -18,6 +21,8 @@ const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_API_KEY;
 const client = twilio(accountSid, authToken);
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 const router = express.Router();
@@ -76,9 +81,14 @@ router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] })
 // Callback route after Google has authenticated the user
 router.get('/callback', passport.authenticate('google', { failureRedirect: '/api/auth/google/error' }), 
     (req, res) => {
-        res.redirect('/api/auth/google/success-auth');
+        res.redirect('/api/auth/google/Terms-auth');
     }
 );
+
+
+router.get('/Terms-auth', async (req, res) => {
+    res.sendFile(path.join(__dirname, '../Views/Accept-terms.html'));
+});
 
 
 // Success logging in via Google
@@ -92,7 +102,7 @@ router.get('/success-auth', async (req, res) => {
 
             // Insert new user into DB
             await pool.query('INSERT INTO Users (user_id, firstName, lastName, eMail, profile_picture, isVerified) VALUES (?, ?, ?, ?, ?, ?)', 
-                [userProfile.id, userProfile.name.givenName, userProfile.name.familyName, userProfile.emails[0].value, userProfile.photos[0].value], 'TRUE');
+                [userProfile.id, userProfile.name.givenName, userProfile.name.familyName, userProfile.emails[0].value, userProfile.photos[0].value, 'TRUE']);
 
             return res.redirect(`/api/user/complete-account/${userProfile.id}`);
 
