@@ -167,4 +167,31 @@ const verifyOTP = async (req, res) => {
     
 };
 
-export { register, login, verifyOTP };
+
+const forgotPassword = async (req, res) => {
+    
+        try {
+            const { eMail } = req.body;
+    
+            const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
+            const user = rows[0];
+            const user_id = user.user_id;
+    
+            if (!user) {
+                return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
+            }
+    
+            const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+    
+            await sendEmail(eMail, user_id, 'resetPassword');
+    
+            return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
+    
+        } catch (error) {
+            console.error('Error during forgot password:', error);
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+        }
+};
+
+
+export { register, login, verifyOTP, forgotPassword };

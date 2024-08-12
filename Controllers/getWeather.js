@@ -9,7 +9,7 @@ const getWeatherData = async (req , res) => {
     try {
         
 
-        const { City , soil_id } = req.body;
+        let { City , soil_id, lat, lon } = req.body;
 
         // Fetch weather data from the API
         const options = {
@@ -19,14 +19,19 @@ const getWeatherData = async (req , res) => {
             }
         };
 
-        const response = await fetch(`https://api.tomorrow.io/v4/weather/realtime?location=${City}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`, options);
+        City = City.replace(' ', '%20');
+
+        const locationURL = `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lon}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`;  
+        // const cityURL`https://api.tomorrow.io/v4/weather/realtime?location=${City}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`;
+
+        const response = await fetch (locationURL , options);
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.message || 'Error fetching weather data');
         }
 
-        console.log(data.data)
+        console.log(data);
 
         // Extract weather conditions
         const { temperature, humidity, precipitationProbability } = data.data.values;

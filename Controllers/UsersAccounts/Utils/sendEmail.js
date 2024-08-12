@@ -14,14 +14,16 @@ const emailTemplates = {
   confirmation: 'confirmationEmail.html',
   deletion: 'deletionEmail.html',
   successdeletion: 'successDeletionEmail.html',
-  OTPverify : 'OTPverifyEmail.html'
+  OTPverify : 'OTPverifyEmail.html',
+  resetPassword : 'resetPasswordEmail.html'
 };
 
 const emailObjects = {
   confirmation: 'Email Confirmation',
   deletion: 'Account Deletion Request',
   successdeletion: 'Account Deleted',
-  OTPverify : '2FA One-Time Password'
+  OTPverify : '2FA One-Time Password',
+  resetPassword : 'Reset Password'
 }
 
 
@@ -65,6 +67,8 @@ const sendEmail = async (email, token, type) => {
       emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
     }else if (type === 'OTPverify'){
       emailHtml = emailTemplate.replace('{{otp}}', token);
+    }else if (type === 'resetPassword'){
+      emailHtml = emailTemplate.replace('reset_link', `http://localhost:8081/api/user/reset-password/${token}`);
     }
 
     const mailOptions = {
