@@ -1,13 +1,13 @@
 {
   "type": "module",
-  "name": "pfechakibbackend",
+  "name": "agrisistance",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "dependencies": {
     "@api/climacell-docs": "file:.api/apis/climacell-docs",
-    "@tensorflow/tfjs-node": "^4.20.0",
     "accepts": "^1.3.8",
+    "agrisistance": "file:",
     "anymatch": "^3.1.3",
     "append-field": "^1.0.0",
     "array-flatten": "^1.1.1",
@@ -115,6 +115,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth": "^2.0.0",
     "path-to-regexp": "^0.1.7",
+    "pfechakibbackend": "file:",
     "picomatch": "^2.3.1",
     "process-nextick-args": "^2.0.1",
     "proxy-addr": "^2.0.7",
