@@ -19,7 +19,7 @@ cloudinary.config({
 
 const addLand = async (req, res) => {
 
-    const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen } = req.body;
+    const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen, budget } = req.body;
     const user_id = req.user.id;
 
     var land_img = null;
@@ -53,7 +53,9 @@ const addLand = async (req, res) => {
 
     try {
 
-      await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id]);
+      const [result] = await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id]);
+      const land_id = result.insertId;
+      await pool.query (`INSERT INTO Financial_Data (investment_amount, land_id, user_id) VALUES (?, ?, ?)`, [budget,land_id, user_id]);
      
         // Update history
         const currentTimestamp = Date.now();
@@ -76,7 +78,7 @@ const addLand = async (req, res) => {
 
 const updateLand = async (req, res) => {
 
-  const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen } = req.body;
+  const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen, budget } = req.body;
   const { land_id } = req.params;
   const user_id = req.user.id;
 
@@ -102,8 +104,8 @@ const updateLand = async (req, res) => {
 
   try {
 
-    await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, land_id, user_id]);
-
+    const [result] = await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, land_id, user_id]);
+    await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ? AND user_id = ?`, [budget, land_id, user_id]);
     // Update history
     const currentTimestamp = Date.now();
     const date = new Date(currentTimestamp);
@@ -132,7 +134,8 @@ const getLandbyID = async (req, res) => {
   try {
 
     const [result] = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
-    res.status(StatusCodes.OK).json(result);
+    const [budget] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
+    res.status(StatusCodes.OK).json({result, budget});
 
   } catch (error) {
 
@@ -154,7 +157,8 @@ const getAllLands = async (req, res) => {
   try{
 
     const [result] = await pool.query('SELECT * FROM Land_Data WHERE user_id = ?', [user_id])
-    res.status(StatusCodes.OK).json(result);
+    const [budget] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE user_id = ?', [user_id]);
+    res.status(StatusCodes.OK).json({result, budget});
 
   } catch (error) {
 
@@ -187,6 +191,7 @@ const deleteLand = async (req, res) => {
     }
 
     // Delete land
+    await pool.query(`DELETE FROM Financial_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
     await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
 
     // Update history
