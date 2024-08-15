@@ -5,7 +5,6 @@ import passport from 'passport';
 import session from 'express-session';
 
 import 'express-async-errors';
-import pool from './DB/connect.js'
 
 import notFoundMiddleware from './Middleware/not-found.js';
 import errorHandlerMiddleware from './Middleware/error-handler.js';

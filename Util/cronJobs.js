@@ -27,7 +27,7 @@ const deleteUserAccountsCronJob = async () => {
           pool.query('DELETE FROM pest_data WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM recommendations WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM weather_data WHERE user_id = ?', [user.user_id]),
-          pool.query('DELETE FROM soil_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM land_data WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM users WHERE user_id = ?', [user.user_id])
       ]);
       

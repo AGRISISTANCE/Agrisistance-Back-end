@@ -19,9 +19,9 @@ const getWeatherData = async (req , res) => {
             }
         };
 
-        City = City.replace(' ', '%20');
+        const locationURL = `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lon}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`; 
 
-        const locationURL = `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lon}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`;  
+        //City = City.replace(' ', '%20');
         // const cityURL`https://api.tomorrow.io/v4/weather/realtime?location=${City}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`;
 
         const response = await fetch (locationURL , options);

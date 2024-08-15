@@ -5,20 +5,20 @@ const predict = async (req, res) => {
   try {
 
     // Get the soil_id from the request body
-    const soil_id = req.body.soil_id;
+    const land_id = req.body.land_id;
     const user_id = req.user.id;
 
     //################################################################################################################
 
     // Fetch the soil data and weather data from the database
-    const [soil_result] = await pool.query('SELECT ph_level, nitrogen, phosphorus, potassium FROM soil_data WHERE user_id = ?', [user_id]);
-    const soil_data = soil_result[0];
+    const [land_result] = await pool.query('SELECT ph_level, nitrogen, phosphorus, potassium FROM land_data WHERE user_id = ?', [user_id]);
+    const land_data = land_result[0];
 
-    const [weather_result] = await pool.query('SELECT temperature, humidity, rainfall FROM weather_data WHERE soil_id = ?', [soil_id]);
+    const [weather_result] = await pool.query('SELECT temperature, humidity, rainfall FROM weather_data WHERE land_id = ?', [land_id]);
     const weather_data = weather_result[0];
    
     // Send the soil data and weather data to the FastAPI server
-    const model_inputs = [soil_data.ph_level, weather_data.temperature, weather_data.rainfall, weather_data.humidity, soil_data.nitrogen, soil_data.phosphorus, soil_data.potassium];
+    const model_inputs = [land_data.ph_level, weather_data.temperature, weather_data.rainfall, weather_data.humidity, land_data.nitrogen, land_data.phosphorus, land_data.potassium];
   
     //################################################################################################################
 
@@ -29,7 +29,7 @@ const predict = async (req, res) => {
 
 
     // Insert the recommendations into the database
-    const [rec_result] = await pool.query(`INSERT INTO Recommendations (user_id, soil_id, weather_id) VALUES (?, ?, ?)`,[user_id, soil_id, weather_data.weather_id]);
+    const [rec_result] = await pool.query(`INSERT INTO Recommendations (user_id, land_id, weather_id) VALUES (?, ?, ?)`,[user_id, land_id, weather_data.weather_id]);
   
     // Insert the predicted crop types into the database
     const cropValues = Object.values(response.data)[0]; 

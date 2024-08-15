@@ -3,7 +3,7 @@ import express from 'express';
 import indexUsersAccount from './indexUsersAccounts.js';
 
 
-import addtSoilData from './addSoilDataRoute.js';
+import landCRUD from './landCRUDRoute.js';
 
 import AddPestData from './addPestDataRoute.js';
 import addYiledPrediction from './addYieldPredictionRoute.js';
@@ -20,7 +20,7 @@ const router = express.Router();
 
 router.use (indexUsersAccount);
 
-router.use('/soil', addtSoilData);
+router.use('/land', landCRUD);
 router.use('/pest', AddPestData);   
 router.use('/yield', addYiledPrediction);
 router.use('/financial', addFinancialData);
