@@ -9,7 +9,7 @@ const getWeatherData = async (req , res) => {
     try {
         
 
-        let { City , soil_id, lat, lon } = req.body;
+        let { City , land_id, lat, lon } = req.body;
 
         // Fetch weather data from the API
         const options = {
@@ -34,16 +34,16 @@ const getWeatherData = async (req , res) => {
         console.log(data);
 
         // Extract weather conditions
-        const { temperature, humidity, precipitationProbability } = data.data.values;
+        const { temperature, humidity, precipitationProbability, uvIndex } = data.data.values;
 
         // Update the Weather_Data table with the fetched weather data
         
         //await pool.query(`DELETE FROM Weather_Data WHERE soil_id = ?`, [soil_id]);
-        await pool.query(`INSERT INTO Weather_Data (temperature, humidity, rainfall, soil_id) 
-                           VALUES (?, ?, ?, ?)`, [temperature, humidity, precipitationProbability, soil_id]);
+        await pool.query(`INSERT INTO Weather_Data (temperature, humidity, rainfall, sunlight, land_id) 
+                           VALUES (?, ?, ?, ?, ?)`, [temperature, humidity, precipitationProbability, uvIndex, land_id]);
 
         // Return the weather data
-        return res.json({ temperature, humidity, precipitation :precipitationProbability });
+        return res.json({ temperature, humidity, precipitation :precipitationProbability , sunlight : uvIndex });
     } catch (error) {
         console.error('Error fetching weather data:', error.message);
         throw error;

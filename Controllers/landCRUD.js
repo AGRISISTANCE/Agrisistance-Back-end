@@ -127,24 +127,35 @@ const updateLand = async (req, res) => {
 
 
 const getLandbyID = async (req, res) => {
-
   const { land_id } = req.params;
   const user_id = req.user.id;
 
   try {
+    // Fetch data concurrently from multiple tables
+    const [crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
+      pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]),
+      pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
+      pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
+      pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]),
+      pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id])
+    ]);
 
-    const [result] = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
-    const [budget] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
-    res.status(StatusCodes.OK).json({result, budget});
+    // Return the data in JSON format
+    res.status(StatusCodes.OK).json({
+      crops: crop_types[0],
+      land: land[0],
+      crop_maintenance: land_statistics[0],
+      land_statistics: crop_maintenance[0],
+      finance: finance[0]
+    });
 
   } catch (error) {
-
     console.error(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
-
   }
-
 };
+
+
 
 
 /****************************************************************************************************************************************************** */
