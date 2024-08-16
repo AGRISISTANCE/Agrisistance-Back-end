@@ -5,9 +5,6 @@ import indexUsersAccount from './indexUsersAccounts.js';
 
 import landCRUD from './landCRUDRoute.js';
 
-import AddPestData from './addPestDataRoute.js';
-import addYiledPrediction from './addYieldPredictionRoute.js';
-import addFinancialData from './addFinancialDataRoute.js';
 import getWeatherData from './getWeatherRoute.js';
 import predict from './predictRoute.js';
 
@@ -16,14 +13,10 @@ import sendTermsConditions from './sendTermsConditionsRoute.js';
 
 const router = express.Router();
 
-
+router.use('/land', landCRUD);
 
 router.use (indexUsersAccount);
 
-router.use('/land', landCRUD);
-router.use('/pest', AddPestData);   
-router.use('/yield', addYiledPrediction);
-router.use('/financial', addFinancialData);
 router.use('/weather', getWeatherData);
 
 router.use('/model', predict);

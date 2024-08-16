@@ -1,11 +1,15 @@
-import pool from '../../DB/connect.js'
-import { StatusCodes } from 'http-status-codes';
+import { v4 as uuidv4 } from 'uuid';
+import {pool} from '../../DB/connect.js'
 import sendEmail from './Utils/sendEmail.js';
+import { StatusCodes } from 'http-status-codes';
+
 
 const getProfile = async (req, res) => {
     const user_id = req.user.id;
 
     try {
+
+        // Get user
         const [rows] = await pool.query('SELECT * FROM Users WHERE user_id = ?', [user_id]);
         const user = rows[0];
 
@@ -21,18 +25,20 @@ const getProfile = async (req, res) => {
 
 const editProfile = async (req, res) => {
     
-    user_id = req.user.id;
+    const user_id = req.user.id;
     const { firstName, lastName, country, role } = req.body;
 
     try {
-        
+
+        // Update user profile
         const sql = 'UPDATE Users SET firstName = ?, lastName = ?, country = ?, role = ? WHERE user_id = ?';
         await pool.query(sql, [firstName, lastName, country, role, user_id]);
 
         // Update history
+        const action_id = uuidv4();
         const currentTimestamp = Date.now();
         const date = new Date(currentTimestamp);
-        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Edit Account', date]);
+        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Edit Account', date]);
     
 
         return res.status(StatusCodes.OK).json({ message: 'Profile updated successfully' });
@@ -46,7 +52,6 @@ const editProfile = async (req, res) => {
 const deleteProfile = async (req, res) => {
 
     const user_id = req.user.id;
-
     const currentTimestamp = Date.now();
     const date = new Date(currentTimestamp);
 
@@ -56,11 +61,11 @@ const deleteProfile = async (req, res) => {
         
         // Send email to the user
         const [email] = await pool.query('SELECT eMail FROM Users WHERE user_id = ?' , [user_id]);
-        
         await sendEmail(email[0].eMail , '', 'deletion');    
 
         // Update History
-        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Request Account Deletion', date]);
+        const action_id = uuidv4();
+        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Request Account Deletion', date]);
         
         res.status(StatusCodes.ACCEPTED).json({ message: 'Account deletion request recieved successfully please check you E-mail' });
 

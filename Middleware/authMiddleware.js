@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import pool from '../DB/connect.js';
+import { pool } from '../DB/connect.js';
 import UnauthenticatedError from '../Errors/UnauthenticatedError.js';
 
 const authenticateUser = async (req, res, next) => {

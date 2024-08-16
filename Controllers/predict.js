@@ -1,5 +1,5 @@
 import axios from 'axios';
-import pool from '../DB/connect.js';
+import {pool} from '../DB/connect.js';
 
 const predict = async (req, res) => {
   try {

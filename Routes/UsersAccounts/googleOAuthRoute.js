@@ -12,6 +12,8 @@ router.get('/Terms-auth', termsAuth);
 
 router.get('/success', successAuth);
 
+router.get('/success-auth', successAuth);
+
 router.get('/error', Error);
 
 export default router;

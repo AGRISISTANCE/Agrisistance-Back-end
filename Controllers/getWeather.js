@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch'; 
-import pool from '../DB/connect.js'; 
+import {pool} from '../DB/connect.js'; 
 import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -38,9 +38,8 @@ const getWeatherData = async (req , res) => {
 
         // Update the Weather_Data table with the fetched weather data
         
-        //await pool.query(`DELETE FROM Weather_Data WHERE soil_id = ?`, [soil_id]);
-        await pool.query(`INSERT INTO Weather_Data (temperature, humidity, rainfall, sunlight, land_id) 
-                           VALUES (?, ?, ?, ?, ?)`, [temperature, humidity, precipitationProbability, uvIndex, land_id]);
+        const weather_id = uuidv4();
+        await pool.query(`INSERT INTO Weather_Data VALUES (?, ?, ?, ?, ?, ?)`, [weather_id, temperature, humidity, precipitationProbability, uvIndex, land_id]);
 
         // Return the weather data
         return res.json({ temperature, humidity, precipitation :precipitationProbability , sunlight : uvIndex });

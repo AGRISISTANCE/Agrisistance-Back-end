@@ -1,13 +1,14 @@
-import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
-
-import fetch from 'node-fetch';
-import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch';
+import { v4 as uuidv4 } from 'uuid';
+import {pool} from '../DB/connect.js';
+import { v2 as cloudinary } from 'cloudinary';
+import { StatusCodes } from 'http-status-codes';
 import { extractPublicId, deleteImageFromCloudinary } from './UsersAccounts/Utils/cloudinaryDelete.js';
 
 dotenv.config();
 
+// Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -47,20 +48,20 @@ const addLand = async (req, res) => {
     const humidity = data.data.values.humidity;
 
 
-    // Insert land data into database
-    const sql = `INSERT INTO Land_Data (latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    // Insert data into the database
+    const sql = `INSERT INTO Land_Data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     try {
-
-      const [result] = await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id]);
-      const land_id = result.insertId;
-      await pool.query (`INSERT INTO Financial_Data (investment_amount, land_id, user_id) VALUES (?, ?, ?)`, [budget,land_id, user_id]);
+      const land_id = uuidv4();
+      const financial_id = uuidv4();
+      await pool.query(sql, [land_id, latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id]);
+      await pool.query (`INSERT INTO Financial_Data (financial_id, investment_amount, land_id, user_id) VALUES (?, ?, ?, ?)`, [financial_id, budget,land_id, user_id]);
      
-        // Update history
-        const currentTimestamp = Date.now();
-        const date = new Date(currentTimestamp);
-        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Add Land', date]);
+      // Update history
+      const action_id = uuidv4();
+      const currentTimestamp = Date.now();
+      const date = new Date(currentTimestamp);
+      await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Add Land', date]);
 
       res.status(StatusCodes.CREATED).json({ message: 'Land added successfully' });
 
@@ -99,17 +100,20 @@ const updateLand = async (req, res) => {
     land_img = uploadResult.secure_url;
   }
 
-  const sql = `UPDATE Land_Data SET latitude = ?, longitude = ?, land_size = ?, land_name = ?, land_image = ?, ph_level = ?, phosphorus = ?, potassium = ?, oxygen_level = ?, nitrogen = ?
-               WHERE land_id = ? AND user_id = ?`;
+  
 
   try {
-
-    const [result] = await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, land_id, user_id]);
+    // Update data in the database
+    const sql = `UPDATE Land_Data SET latitude = ?, longitude = ?, land_size = ?, land_name = ?, land_image = ?, ph_level = ?, phosphorus = ?, potassium = ?, oxygen_level = ?, nitrogen = ?
+    WHERE land_id = ? AND user_id = ?`;
+    await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, land_id, user_id]);
     await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ? AND user_id = ?`, [budget, land_id, user_id]);
+
     // Update history
+    const actions_id = uuidv4();
     const currentTimestamp = Date.now();
     const date = new Date(currentTimestamp);
-    await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Update Land', date]);
+    await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[actions_id, user_id, 'Update Land', date]);
 
     res.status(StatusCodes.OK).json({ message: 'Land updated successfully' });
   
@@ -166,7 +170,7 @@ const getAllLands = async (req, res) => {
   const user_id = req.user.id;
 
   try{
-
+    // Fetch all lands of the user
     const [result] = await pool.query('SELECT * FROM Land_Data WHERE user_id = ?', [user_id])
     const [budget] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE user_id = ?', [user_id]);
     res.status(StatusCodes.OK).json({result, budget});
@@ -183,7 +187,7 @@ const getAllLands = async (req, res) => {
 /****************************************************************************************************************************************************** */
 
 
-// make hierarichal deletion and maybe not delete it but migrate it to another database
+// TODO: make hierarichal deletion and maybe not delete it but migrate it to another database
 
 const deleteLand = async (req, res) => {
 
@@ -206,9 +210,10 @@ const deleteLand = async (req, res) => {
     await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
 
     // Update history
+    const action_id = uuidv4();
     const currentTimestamp = Date.now();
     const date = new Date(currentTimestamp);
-    await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Delete Land', date]);
+    await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Delete Land', date]);
 
     res.status(StatusCodes.OK).json({ message: 'Land deleted successfully' });
 

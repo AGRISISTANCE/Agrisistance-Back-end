@@ -15,7 +15,8 @@ const emailTemplates = {
   deletion: 'deletionEmail.html',
   successdeletion: 'successDeletionEmail.html',
   OTPverify : 'OTPverifyEmail.html',
-  resetPassword : 'resetPasswordEmail.html'
+  resetPassword : 'resetPasswordEmail.html',
+  updateVerification : 'updateVerificationEmail.html'
 };
 
 const emailObjects = {
@@ -23,7 +24,8 @@ const emailObjects = {
   deletion: 'Account Deletion Request',
   successdeletion: 'Account Deleted',
   OTPverify : '2FA One-Time Password',
-  resetPassword : 'Reset Password'
+  resetPassword : 'Reset Password',
+  updateVerification : 'Update Verification'
 }
 
 
@@ -64,11 +66,13 @@ const sendEmail = async (email, token, type) => {
     
     // Edit E-mails by injection variables
     if (type === 'confirmation'){
-      emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/user/register/verify/${token}`);
+      emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/profile/register/verify/${token}`);
     }else if (type === 'OTPverify'){
       emailHtml = emailTemplate.replace('{{otp}}', token);
     }else if (type === 'resetPassword'){
-      emailHtml = emailTemplate.replace('reset_link', `http://localhost:8081/api/user/reset-password/${token}`);
+      emailHtml = emailTemplate.replace('reset_link', `http://localhost:8081/api/profile/reset-password/${token}`);
+    }else if (type === 'updateVerification'){
+      emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/profile/update-email/verify/${token}`);
     }
 
     const mailOptions = {
@@ -106,7 +110,7 @@ export default sendEmail;
 //     });
 
 //     const message = await client.sendAsync ({
-//       text: `Click the following link to verify your email: http://localhost:8081/api/user/register/verify/${token}`,
+//       text: `Click the following link to verify your email: http://localhost:8081/api/profile/register/verify/${token}`,
 //       from: process.env.EMAIL_USER,
 //       to: email,
 //       subject: 'Email Confirmation',

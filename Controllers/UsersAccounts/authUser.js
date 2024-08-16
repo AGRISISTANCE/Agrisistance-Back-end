@@ -1,13 +1,13 @@
+import dotenv from 'dotenv';
+import twilio from 'twilio';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { StatusCodes } from 'http-status-codes';
-import pool from '../../DB/connect.js';
-import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
+import {pool} from '../../DB/connect.js';
 import sendEmail from './Utils/sendEmail.js';
+import { StatusCodes } from 'http-status-codes';
 import randomNumbers from './Utils/randomNumbers.js'
 
-import twilio from 'twilio';
 
 dotenv.config();
 
@@ -33,7 +33,6 @@ const register = async (req, res) => {
         const user_id = uuidv4();
     
         // Insert the user into the database
-        // User's remaining fields are set to their default values by MYSQL (e.g., isVerified = 0 , profile_picture = predefined default image , subscription_type = Basic)
         const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?)';
         await pool.query(sql, [user_id, firstName, lastName, country, role, eMail, hashedPassword]);
 
@@ -44,10 +43,12 @@ const register = async (req, res) => {
         await sendEmail(eMail, token, 'confirmation');
         
         // update history
+        const actions_id = uuidv4();
         const currentTimestamp = Date.now();
         const date = new Date(currentTimestamp);
-        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Create Account', date]);
+        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[actions_id, user_id, 'Create Account', date]);
 
+        // Send response
         res.status(StatusCodes.CREATED).json({ message: 'User created successfully please verify your account via the link sent by Email' });
     
     } catch (error) {
@@ -60,6 +61,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Check if the user exists
         const [rows] = await pool.query('SELECT * FROM Users WHERE email = ?', [email]);
         const user = rows[0];
         const user_id = user.user_id
@@ -68,11 +70,13 @@ const login = async (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email' });
         }
 
+        // Check if the password is correct
         const isCorrectPassword = await bcrypt.compare(password, user.password);
         if (!isCorrectPassword) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid password' });
         }
 
+        // Check if the email is verified
         if (user.isVerified === 'FALSE') {
             
             // Send confirmation email again
@@ -87,7 +91,8 @@ const login = async (req, res) => {
         await pool.query('UPDATE Users SET last_login = ?, deletion_requested_at = ? WHERE user_id = ?', [date, null, user_id]);
         
         // Update History
-        await pool.query('INSERT INTO history (user_id, action_details, date_time) VALUES (?, ?, ?)',[user_id, 'Log in Account', date]);
+        const action_id = uuidv4();
+        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Log in Account', date]);
         
         // Send JWT if no 2FA
         if (user.is_2fa_enabled === 'FALSE'){
@@ -120,10 +125,8 @@ const login = async (req, res) => {
 
 
         // Send it via email instead
-        await sendEmail(user.eMail, randomNumber, 'OTPverify');
-        
+        await sendEmail(user.eMail, randomNumber, 'OTPverify'); 
         console.log(`Generated number for : ${randomNumber}`);
-
         const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
 
         return res.status(StatusCodes.OK).json({
@@ -144,15 +147,16 @@ const verifyOTP = async (req, res) => {
 
     const user_id = req.user.id;
 
-    const number = req.body.number;
+    const {otp} = req.body;
     const correctNumber = randomNumbers[user_id];
 
+    // Check if the number was generated
     if (typeof correctNumber === 'undefined') {
         return res.status(StatusCodes.BAD_GATEWAY).send('No number generated for this ID');
     }
 
     // Verify OTP
-    if (number === correctNumber) {
+    if (otp === correctNumber) {
         const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
 
         return res.status(StatusCodes.OK).json({
@@ -173,6 +177,7 @@ const forgotPassword = async (req, res) => {
         try {
             const { eMail } = req.body;
     
+            // Check if the user exists
             const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
             const user = rows[0];
             const user_id = user.user_id;
@@ -181,10 +186,11 @@ const forgotPassword = async (req, res) => {
                 return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
             }
     
+            // Create a token and send the email
             const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
-    
             await sendEmail(eMail, user_id, 'resetPassword');
     
+            // Send response
             return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
     
         } catch (error) {
