@@ -30,7 +30,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.MY_REDIRECT_URI,
+            callbackURL: process.env.AGRISISTANCE_REDIRECT_URI,
         },
         function (accessToken, refreshToken, profile, done) {
             userProfile = profile;
