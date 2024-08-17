@@ -115,6 +115,8 @@ const updateLand = async (req, res) => {
     const date = new Date(currentTimestamp);
     await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[actions_id, user_id, 'Update Land', date]);
 
+    //TODO : predict again
+
     res.status(StatusCodes.OK).json({ message: 'Land updated successfully' });
   
   } catch (error) {
@@ -136,7 +138,8 @@ const getLandbyID = async (req, res) => {
 
   try {
     // Fetch data concurrently from multiple tables
-    const [crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
+    const [weather, crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
+      pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
       pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
@@ -148,8 +151,9 @@ const getLandbyID = async (req, res) => {
     res.status(StatusCodes.OK).json({
       crops: crop_types[0],
       land: land[0],
-      crop_maintenance: land_statistics[0],
-      land_statistics: crop_maintenance[0],
+      crop_maintenance: crop_maintenance[0],
+      weather: weather[0],
+      land_statistics: land_statistics[0],
       finance: finance[0]
     });
 

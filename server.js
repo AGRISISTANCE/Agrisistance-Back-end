@@ -38,6 +38,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.get('/', (req, res) => { res.json({ message: 'Agrisistance API' })});
 app.use('/api', routes);
 
 // Error handling

@@ -64,11 +64,12 @@ const login = async (req, res) => {
         // Check if the user exists
         const [rows] = await pool.query('SELECT * FROM Users WHERE email = ?', [email]);
         const user = rows[0];
-        const user_id = user.user_id
 
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email' });
         }
+
+        const user_id = user.user_id
 
         // Check if the password is correct
         const isCorrectPassword = await bcrypt.compare(password, user.password);
