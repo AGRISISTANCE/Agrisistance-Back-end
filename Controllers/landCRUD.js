@@ -208,7 +208,7 @@ const deleteLand = async (req, res) => {
   try {
 
     // Check if there is an image to delete
-    const [result] = await pool.query('SELECT land_image FROM land_data WHERE land_id = ?', [land_id]);
+    const [result] = await pool.query('SELECT land_image FROM Land_Data WHERE land_id = ?', [land_id]);
     if (result[0].land_image) {
       const publicId = extractPublicId(userRows[0].profile_picture);
       if (publicId) {
