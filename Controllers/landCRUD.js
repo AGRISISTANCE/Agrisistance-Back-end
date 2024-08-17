@@ -138,14 +138,21 @@ const getLandbyID = async (req, res) => {
 
   try {
     // Fetch data concurrently from multiple tables
-    const [weather, crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
+    /*const [weather, crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
       pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
       pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id])
-    ]);
+    ]);*/
+
+    const weather = await pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]);
+    const crop_types = await pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]);
+    const land = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
+    const land_statistics = await pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]);
+    const crop_maintenance = await pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]);
+    const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
 
     // Return the data in JSON format
     res.status(StatusCodes.OK).json({
