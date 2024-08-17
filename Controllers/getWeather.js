@@ -44,7 +44,7 @@ const getWeatherData = async (req , res) => {
         // Return the weather data
         return res.json({ temperature, humidity, precipitation :precipitationProbability , sunlight : uvIndex });
     } catch (error) {
-        console.error('Error fetching weather data:', error.message);
+        console.error('Error fetching weather data:', error);
         throw error;
     }
 };
