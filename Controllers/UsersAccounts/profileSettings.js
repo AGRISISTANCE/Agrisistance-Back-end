@@ -160,7 +160,7 @@ const unable2FA = async (req, res) => {
 
     try{
         // Update the user's phone number and enable 2FA
-        await pool.query('UPDATE users SET phoneNumber = ? , is_2fa_enabled = ? WHERE user_id = ?', [phoneNumber,'TRUE', user_id]);
+        await pool.query('UPDATE Users SET phoneNumber = ? , is_2fa_enabled = ? WHERE user_id = ?', [phoneNumber,'TRUE', user_id]);
 
         // Update history
         const action_id = uuidv4();

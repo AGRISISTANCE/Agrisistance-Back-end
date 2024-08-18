@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import passport from 'passport';
 import session from 'express-session';
 
+
 import 'express-async-errors';
 
 import notFoundMiddleware from './Middleware/not-found.js';
@@ -21,6 +22,7 @@ app.use(session({
   saveUninitialized: true,
   secret: process.env.SESSION_SECRET,
 }));
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
@@ -38,6 +40,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.get('/', (req, res) => { res.json({ message: 'Agrisistance API' })});
 app.use('/api', routes);
 
 // Error handling

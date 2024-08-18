@@ -18,6 +18,7 @@ const deleteUserAccountsCronJob = async () => {
         }
   
         // Delete the user account and his data
+        
         const [history, financial_data, yield_predictions, crop_types, pest_data, recommendations, weather_data, land_data, users ] = await Promise.all([
           pool.query('SELECT * FROM history WHERE user_id = ?', [user.user_id]),
           pool.query('SELECT * FROM financial_data WHERE user_id = ?', [user.user_id]),

@@ -30,7 +30,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.MY_REDIRECT_URI,
+            callbackURL: process.env.AGRISISTANCE_REDIRECT_URI,
         },
         function (accessToken, refreshToken, profile, done) {
             userProfile = profile;
@@ -87,6 +87,8 @@ const callback = (req, res) => {
 
 // Route to accept terms
 const termsAuth =  async (req, res) => {
+    const [exists] = await pool.query('SELECT 1 FROM Users WHERE user_id = ? OR eMail = ?', [userProfile.id, userProfile.emails[0].value]);
+    if (exists.length === 0) return res.redirect('/api/auth/google/success-auth');
     res.sendFile(path.join(__dirname, '../../Views/Accept-terms.html'));
 };
 
