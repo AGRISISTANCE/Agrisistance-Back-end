@@ -72,6 +72,12 @@ const updateEmail = async (req, res) => {
     const user_id = req.user.id;
     const {eMail} = req.body;
 
+    // Check if the email is already in use
+    const [rows] = await pool.query('SELECT 1 FROM Users WHERE eMail = ?', [eMail]);
+    if (rows.length > 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Email already in use' });
+    }
+
     // Send a verification E-mail
     const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '2m' });
     await sendEmail(eMail, token, 'updateVerification');
