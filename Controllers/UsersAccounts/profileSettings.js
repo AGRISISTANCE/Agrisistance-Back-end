@@ -30,29 +30,6 @@ cloudinary.config({
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /************************************************************************************************************************** */
-const resetPassword = async (req, res) => {
-    const user_id = req.params.user_id;
-    const { newPassword } = req.body;
-
-    try {
-        // Hash the new password and update the user's password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await pool.query('UPDATE Users SET password = ? WHERE user_id = ?', [hashedPassword, user_id]);
-
-        // Update history
-        const action_id = uuidv4();
-        const currentTimestamp = Date.now();
-        const date = new Date(currentTimestamp);
-        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Reset Password', date]);
-
-        return res.status(StatusCodes.OK).json({ message: 'Password updated successfully' });
-    }
-    catch (error) {
-        console.error('Error during password update:', error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
-    }
-};
-
 
 const updatePassword = async (req, res) => {
     const user_id = req.user.id;
@@ -223,43 +200,6 @@ const UploadPFP = async (req, res) => {
 
 /************************************************************************************************************************** */
 
-const verifyUserEmail = async (req, res) => {
-    try {
-        const token = req.params.token
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
-
-        const user_id = payload.user_id;
-        
-        // Update the user's email verification status
-        await pool.query('UPDATE Users SET isVerified = ? WHERE user_id = ?', [ 'TRUE', user_id ]);
-
-        // Update history
-        const action_id = uuidv4();
-        const currentTimestamp = Date.now();
-        const date = new Date(currentTimestamp);
-        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Verify E-mail', date]);
-    
-        // Send the token
-        const realToken = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
-        return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
-
-    } catch (e) {
-  
-      if (e.name === 'TokenExpiredError') {
-
-        // Serve an HTML page for expired token
-        return res.status(StatusCodes.UNAUTHORIZED).sendFile(path.join(__dirname, '../../Views/TokenExpired.html'));
-        
-      }
-
-      console.error('Error verifying email:', e);
-      res.status(400).send('Error verifying email'); 
-    }
-
-};
-
-/************************************************************************************************************************** */
-
 const UpdateSubscription = async (req, res) => {
 
     // Get the subscription_type , payment_method_id and user_id 
@@ -309,4 +249,4 @@ const UpdateSubscription = async (req, res) => {
     }
 };
 
-export { resetPassword, updatePassword, updateEmail, verifyUpdateEmail, completeAccount, unable2FA, UploadPFP, verifyUserEmail, UpdateSubscription };
+export { updatePassword, updateEmail, verifyUpdateEmail, completeAccount, unable2FA, UploadPFP, UpdateSubscription };

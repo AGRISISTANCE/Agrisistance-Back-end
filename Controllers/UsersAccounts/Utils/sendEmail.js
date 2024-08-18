@@ -66,11 +66,11 @@ const sendEmail = async (email, token, type) => {
     
     // Edit E-mails by injection variables
     if (type === 'confirmation'){
-      emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/profile/register/verify/${token}`);
+      emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/auth/register/verify/${token}`);
     }else if (type === 'OTPverify'){
       emailHtml = emailTemplate.replace('{{otp}}', token);
     }else if (type === 'resetPassword'){
-      emailHtml = emailTemplate.replace('reset_link', `https://agrisistance-server.onrender.com/api/profile/reset-password/${token}`);
+      emailHtml = emailTemplate.replace('reset_link', `https://agrisistance-server.onrender.com/api/auth/reset-password/${token}`);
     }else if (type === 'updateVerification'){
       emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/profile/update-email/verify/${token}`);
     }
