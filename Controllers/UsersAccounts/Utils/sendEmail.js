@@ -16,7 +16,7 @@ const emailTemplates = {
   successdeletion: 'successDeletionEmail.html',
   OTPverify : 'OTPverifyEmail.html',
   resetPassword : 'resetPasswordEmail.html',
-  updateVerification : 'updateVerificationEmail.html'
+  updateVerification : 'updateVerifEmail.html'
 };
 
 const emailObjects = {
