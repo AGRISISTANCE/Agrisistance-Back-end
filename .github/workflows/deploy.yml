@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy to Railway
 
 on:
   push:
@@ -8,23 +8,28 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '18' # Use a Node.js version that supports the required modules
+          node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build Docker image
+        run: docker build -t my-express-app .
 
-      - name: Clear npm cache
-        run: npm cache clean --force
+      - name: Push Docker image to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          docker tag my-express-app railway/app-id/my-express-app
+          docker push railway/app-id/my-express-app
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy to Railway
+        run: |
+          curl -X POST -H "Authorization: Bearer $RAILWAY_TOKEN" \
+          -F "image=my-express-app" \
+          https://railway.app/api/v1/projects/your-project-id/deployments
