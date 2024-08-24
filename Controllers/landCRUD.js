@@ -63,7 +63,7 @@ const addLand = async (req, res) => {
       const date = new Date(currentTimestamp);
       await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Add Land', date]);
 
-      res.status(StatusCodes.CREATED).json({ message: 'Land added successfully' });
+      res.status(StatusCodes.CREATED).json({ message: 'Land added successfully', land_id : land_id });
 
     } catch (error) {
 

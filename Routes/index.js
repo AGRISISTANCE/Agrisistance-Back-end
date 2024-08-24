@@ -6,7 +6,7 @@ import indexUsersAccount from './indexUsersAccounts.js';
 import landCRUD from './landCRUDRoute.js';
 
 import getWeatherData from './getWeatherRoute.js';
-import predict from './predictRoute.js';
+import modelsPredictions from './modelsPredictionRoute.js';
 
 import sendTermsConditions from './sendTermsConditionsRoute.js';
 
@@ -19,7 +19,7 @@ router.use (indexUsersAccount);
 
 router.use('/weather', getWeatherData);
 
-router.use('/model', predict);
+router.use('/model', modelsPredictions);
 
 router.use(sendTermsConditions);
 
