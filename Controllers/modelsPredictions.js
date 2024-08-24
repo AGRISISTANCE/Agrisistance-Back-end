@@ -30,7 +30,7 @@ const generateBusinessPlan = async (req, res) => {
       land_data.land_size];
 
     // Send the model inputs to the FastAPI server
-    const response = await axios.post('http://localhost:8082/generate-business-plan', {input: model_inputs});
+    const response = await axios.post('http://localhost:8000/generate-business-plan', {input: model_inputs});
 
 
     // TODO : Insert the recommendations into the database
@@ -60,7 +60,7 @@ const chatBot = async (req, res) => {
 
   try {
 
-    const response = await fetch('http://localhost:8082/chat', {  // Adjust the URL if needed
+    const response = await fetch('http://localhost:8000/chat', {  // Adjust the URL if needed
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
