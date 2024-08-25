@@ -11,32 +11,10 @@ const generateBusinessPlan = async (req, res) => {
     const { land_id } = req.body;
     const user_id = req.user.id;
 
-
-    // Fetch the soil data and weather data from the database
-    const [land_result] = await pool.query('SELECT land_size, ph_level, phosphorus, potassium, oxygen_level, nitrogen FROM land_data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
-    const land_data = land_result[0];
-
-    const [weather_result] = await pool.query('SELECT temperature, humidity, rainfall FROM weather_data WHERE land_id = ?', [land_id]);
-    const weather_data = weather_result[0];
-
-    const [financial_result] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE user_id = ?', [user_id]);
-    const financial_data = financial_result[0];
-
-
-   
-    // Prepare the model inputs
-    const model_inputs = [land_data.ph_level, weather_data.temperature, weather_data.rainfall, weather_data.humidity,
-      land_data.nitrogen, land_data.phosphorus, land_data.potassium, land_data.oxygen_level, financial_data.investment_amount,
-      land_data.land_size];
-
     // Send the model inputs to the FastAPI server
-    const response = await axios.post('http://localhost:8000/generate-business-plan', {input: model_inputs});
+    const response = await axios.post('http://localhost:8000/generate-business-plan', {land_id});
 
 
-    // TODO : Insert the recommendations into the database
-
-
-      
     // Update history
     const action_id = uuidv4();
     const currentTimestamp = Date.now();
