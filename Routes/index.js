@@ -2,10 +2,8 @@ import express from 'express';
 
 import indexUsersAccount from './indexUsersAccounts.js';
 
-
 import landCRUD from './landCRUDRoute.js';
 
-import getWeatherData from './getWeatherRoute.js';
 import modelsPredictions from './modelsPredictionRoute.js';
 
 import sendTermsConditions from './sendTermsConditionsRoute.js';
@@ -17,7 +15,6 @@ router.use('/land', landCRUD);
 
 router.use (indexUsersAccount);
 
-router.use('/weather', getWeatherData);
 
 router.use('/model', modelsPredictions);
 

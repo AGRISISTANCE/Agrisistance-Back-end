@@ -33,7 +33,7 @@ const addLand = async (req, res) => {
     
     
 
-    // Get humidity from API
+    // Get weather from API
     const options = {
       method: 'GET',
       headers: {
@@ -45,18 +45,26 @@ const addLand = async (req, res) => {
     const response = await fetch (locationURL , options);
     const data = await response.json();
 
-    const humidity = data.data.values.humidity;
+    
+    const { temperature, humidity, precipitationProbability, uvIndex } = data.data.values;
 
 
     // Insert data into the database
-    const sql = `INSERT INTO Land_Data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO Land_Data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     try {
       const land_id = uuidv4();
       const financial_id = uuidv4();
-      await pool.query(sql, [land_id, latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, user_id]);
-      await pool.query (`INSERT INTO Financial_Data (financial_id, investment_amount, land_id, user_id) VALUES (?, ?, ?, ?)`, [financial_id, budget,land_id, user_id]);
+      await pool.query(sql, [land_id, latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, user_id]);
+
+      // Insert financial data
+      await pool.query (`INSERT INTO Financial_Data (financial_id, investment_amount, land_id) VALUES (?, ?, ?)`, [financial_id, budget,land_id]);
+
+      // Insert weather data
+      const weather_id = uuidv4();
+      await pool.query(`INSERT INTO Weather_Data VALUES (?, ?, ?, ?, ?, ?)`, [weather_id, temperature, humidity, precipitationProbability, uvIndex, land_id]);
      
+
       // Update history
       const action_id = uuidv4();
       const currentTimestamp = Date.now();
@@ -79,7 +87,7 @@ const addLand = async (req, res) => {
 
 const updateLand = async (req, res) => {
 
-  const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen, budget } = req.body;
+  const { latitude, longitude, land_size, land_name, land_image, ph_level, phosphorus, potassium, oxygen_level, nitrogen, humidity, budget } = req.body;
   const { land_id } = req.params;
   const user_id = req.user.id;
 
@@ -107,7 +115,11 @@ const updateLand = async (req, res) => {
     const sql = `UPDATE Land_Data SET latitude = ?, longitude = ?, land_size = ?, land_name = ?, land_image = ?, ph_level = ?, phosphorus = ?, potassium = ?, oxygen_level = ?, nitrogen = ?
     WHERE land_id = ? AND user_id = ?`;
     await pool.query(sql, [latitude, longitude, land_size, land_name, land_img, ph_level, phosphorus, potassium, oxygen_level, nitrogen, land_id, user_id]);
-    await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ? AND user_id = ?`, [budget, land_id, user_id]);
+
+    await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ?`, [budget, land_id]);
+    await pool.query (`UPDATE Weather_Data SET humidity = ? WHERE land_id = ?`, [humidity, land_id]);
+
+    //const response = await axios.post('https://agrisistance-model-backend.onrender.com/generate-business-plan', {land_id});
 
     // Update history
     const actions_id = uuidv4();
@@ -117,7 +129,11 @@ const updateLand = async (req, res) => {
 
     //TODO : predict again
 
-    res.status(StatusCodes.OK).json({ message: 'Land updated successfully' });
+    res.status(StatusCodes.OK)
+    .json({ message: 'Land updated successfully', 
+      land_id : land_id , 
+      //businessplan : response
+    });
   
   } catch (error) {
 
@@ -144,7 +160,7 @@ const getLandbyID = async (req, res) => {
       pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
       pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]),
-      pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id])
+      pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id])
     ]);*/
 
     const weather = await pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]);
@@ -152,7 +168,7 @@ const getLandbyID = async (req, res) => {
     const land = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
     const land_statistics = await pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]);
     const crop_maintenance = await pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]);
-    const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
+    const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id]);
 
     // Return the data in JSON format
     res.status(StatusCodes.OK).json({
@@ -183,8 +199,7 @@ const getAllLands = async (req, res) => {
   try{
     // Fetch all lands of the user
     const [result] = await pool.query('SELECT * FROM Land_Data WHERE user_id = ?', [user_id])
-    const [budget] = await pool.query('SELECT investment_amount FROM Financial_Data WHERE user_id = ?', [user_id]);
-    res.status(StatusCodes.OK).json({result, budget});
+    res.status(StatusCodes.OK).json({result, });
 
   } catch (error) {
 
@@ -217,7 +232,7 @@ const deleteLand = async (req, res) => {
     }
 
     // Delete land
-    await pool.query(`DELETE FROM Financial_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
+    await pool.query(`DELETE FROM Financial_Data WHERE land_id = ?`, [land_id]);
     await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
 
     // Update history
