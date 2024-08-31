@@ -104,7 +104,7 @@ const verifyUpdateEmail = async (req, res) => {
         const date = new Date(currentTimestamp);
         await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Update Email', date]);
 
-        return res.redirect('https://agrisistatnce.netlify.app/auth/login');
+        return res.redirect('http://localhost:3000/auth/login');
         // res.status(StatusCodes.OK).json({ message: 'Email updated successfully' });
     } catch (error) {
         console.error(error);
