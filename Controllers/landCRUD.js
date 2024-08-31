@@ -119,7 +119,7 @@ const updateLand = async (req, res) => {
     await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ?`, [budget, land_id]);
     await pool.query (`UPDATE Weather_Data SET humidity = ? WHERE land_id = ?`, [humidity, land_id]);
 
-    //const response = await axios.post('https://agrisistance-model-backend.onrender.com/generate-business-plan', {land_id});
+    //const response = await axios.post('http://localhost:8000/generate-business-plan', {land_id});
 
     // Update history
     const actions_id = uuidv4();
