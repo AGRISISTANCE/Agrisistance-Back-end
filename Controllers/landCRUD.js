@@ -170,6 +170,8 @@ const getLandbyID = async (req, res) => {
     const crop_maintenance = await pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]);
     const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id]);
 
+    const business_plan = await pool.query('SELECT * FROM Business_Plans WHERE land_id = ?', [land_id]);
+
     // Return the data in JSON format
     res.status(StatusCodes.OK).json({
       crops: crop_types[0],
@@ -177,7 +179,8 @@ const getLandbyID = async (req, res) => {
       crop_maintenance: crop_maintenance[0],
       weather: weather[0],
       land_statistics: land_statistics[0],
-      finance: finance[0]
+      finance: finance[0],
+      business_plan: business_plan[0],
     });
 
   } catch (error) {
@@ -224,7 +227,7 @@ const deleteLand = async (req, res) => {
 
     // Check if there is an image to delete
     const [result] = await pool.query('SELECT land_image FROM Land_Data WHERE land_id = ?', [land_id]);
-    if (result[0].land_image) {
+    if (result[0].land_image !== null) {
       const publicId = extractPublicId(userRows[0].profile_picture);
       if (publicId) {
           await deleteImageFromCloudinary(publicId, 'Land-Pictures');
@@ -232,7 +235,13 @@ const deleteLand = async (req, res) => {
     }
 
     // Delete land
+    
     await pool.query(`DELETE FROM Financial_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Weather_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Crop_Maintenance WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Crop_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Business_Plans WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Land_Statistics WHERE land_id = ?`, [land_id]);
     await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
 
     // Update history

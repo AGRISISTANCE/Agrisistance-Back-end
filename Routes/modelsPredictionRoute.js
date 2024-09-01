@@ -6,6 +6,6 @@ const router = express.Router();
 
 
 router.post('/generate-business-plan', authenticateUser, generateBusinessPlan);
-router.post('/chat-bot', authenticateUser, chatBot);
+router.post('/chat-bot', chatBot);
 
 export default router;
