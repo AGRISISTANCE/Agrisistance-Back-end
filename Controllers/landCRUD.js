@@ -235,13 +235,14 @@ const deleteLand = async (req, res) => {
     }
 
     // Delete land
-      await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
-      await pool.query(`DELETE FROM Financial_Data WHERE land_id = ?`, [land_id]);
-      await pool.query(`DELETE FROM Weather_Data WHERE land_id = ?`, [land_id]);
-      await pool.query(`DELETE FROM Crop_Data WHERE land_id = ?`, [land_id]);
-      await pool.query(`DELETE FROM Crop_Maintenance WHERE land_id = ?`, [land_id]);
-      await pool.query(`DELETE FROM Land_Statistics WHERE land_id = ?`, [land_id]);
-      await pool.query(`DELETE FROM Business_Plans WHERE land_id = ?`, [land_id]);
+    
+    await pool.query(`DELETE FROM Financial_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Weather_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Crop_Maintenance WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Crop_Data WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Business_Plans WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Land_Statistics WHERE land_id = ?`, [land_id]);
+    await pool.query(`DELETE FROM Land_Data WHERE land_id = ? AND user_id = ?`, [land_id, user_id]);
 
     // Update history
     const action_id = uuidv4();
