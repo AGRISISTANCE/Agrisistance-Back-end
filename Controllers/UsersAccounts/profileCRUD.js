@@ -8,14 +8,14 @@ const getProfile = async (req, res) => {
     const user_id = req.user.id;
 
     try {
-
-        // Get user
-        const [rows] = await pool.query('SELECT * FROM Users WHERE user_id = ?', [user_id]);
+        const [rows] = await pool.query(
+            'SELECT user_id, firstName, lastName, country, phoneNumber, eMail, profile_picture, subscription_type FROM Users WHERE user_id = ?',
+            [user_id]
+        );
         const user = rows[0];
 
         return res.status(StatusCodes.OK).json(user);
-    }
-    catch (error) {
+    } catch (error) {
         console.error('Error during profile retrieval:', error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
     }
@@ -23,16 +23,17 @@ const getProfile = async (req, res) => {
 
 
 
+
 const editProfile = async (req, res) => {
     
     const user_id = req.user.id;
-    const { firstName, lastName, country, role } = req.body;
+    const { firstName, lastName, country, phoneNumber } = req.body;
 
     try {
 
         // Update user profile
-        const sql = 'UPDATE Users SET firstName = ?, lastName = ?, country = ?, role = ? WHERE user_id = ?';
-        await pool.query(sql, [firstName, lastName, country, role, user_id]);
+        const sql = 'UPDATE Users SET firstName = ?, lastName = ?, country = ? phoneNumber = ? WHERE user_id = ?';
+        await pool.query(sql, [firstName, lastName, country, phoneNumber, user_id]);
 
         // Update history
         const action_id = uuidv4();

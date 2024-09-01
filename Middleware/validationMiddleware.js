@@ -23,8 +23,7 @@ const validateRegister = [
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
   body('country').notEmpty().withMessage('Country is required'),
-  body('role').isIn(['Owner', 'Worker']).withMessage('Role must be either owner or worker'),
-  //body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Phone number must be in the correct international format'),
+  body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Phone number must be in the correct international format'),
 ];
 
 const validateLogin = [
@@ -67,8 +66,7 @@ const validateEditProfile = [
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
   body('country').notEmpty().withMessage('Country is required'),
-  body('role').isIn(['Owner', 'Worker']).withMessage('Role must be either owner or worker'),
-  //body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Phone number must be in the correct international format'),
+  body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Phone number must be in the correct international format'),
 ];
 
 const validateCompleteAccount = [

@@ -79,7 +79,7 @@ const updateEmail = async (req, res) => {
     }
 
     // Send a verification E-mail
-    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '2m' });
+    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '10m' });
     await sendEmail(eMail, token, 'updateVerification');
     
     res.status(StatusCodes.OK).json({ message: 'Verification email sent' });
@@ -98,7 +98,14 @@ const verifyUpdateEmail = async (req, res) => {
         // Update the user's email
         await pool.query('UPDATE Users SET eMail = ? WHERE user_id = ?', [eMail, user_id]);
 
-        res.status(StatusCodes.OK).json({ message: 'Email updated successfully' });
+        // Update history
+        const action_id = uuidv4();
+        const currentTimestamp = Date.now();
+        const date = new Date(currentTimestamp);
+        await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Update Email', date]);
+
+        return res.redirect('https://agrisistatnce.netlify.app/dashboard/profile/email-updated-successfully');
+        // res.status(StatusCodes.OK).json({ message: 'Email updated successfully' });
     } catch (error) {
         console.error(error);
         res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid or expired token' });

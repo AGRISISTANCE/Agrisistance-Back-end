@@ -20,7 +20,7 @@ const register = async (req, res) => {
 
     try {
 
-        const { firstName, lastName, country, role, eMail, password } = req.body;
+        const { firstName, lastName, country, phoneNumber, eMail, password } = req.body;
 
         // Check if the e-mail already exists
         const [rows] = await pool.query('SELECT 1 FROM Users WHERE eMail = ?', [eMail]);
@@ -33,11 +33,11 @@ const register = async (req, res) => {
         const user_id = uuidv4();
     
         // Insert the user into the database
-        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, role, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        await pool.query(sql, [user_id, firstName, lastName, country, role, eMail, hashedPassword]);
+        const sql = 'INSERT INTO Users (user_id, firstName, lastName, country, phoneNumber, eMail, password) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        await pool.query(sql, [user_id, firstName, lastName, country, phoneNumber, eMail, hashedPassword]);
 
         // Create a token
-        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
 
         // Send confirmation email
         await sendEmail(eMail, token, 'confirmation');
@@ -85,7 +85,7 @@ const login = async (req, res) => {
         if (user.isVerified === 'FALSE') {
             
             // Send confirmation email again
-            const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+            const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
             await sendEmail(user.eMail, token, 'confirmation');
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
@@ -132,7 +132,7 @@ const login = async (req, res) => {
         // Send it via email instead
         await sendEmail(user.eMail, randomNumber, 'OTPverify'); 
         console.log(`Generated number for : ${randomNumber}`);
-        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
 
         return res.status(StatusCodes.OK).json({
             msg : "number generated",
@@ -169,7 +169,12 @@ const verifyUserEmail = async (req, res) => {
     
         // Send the token
         const realToken = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+<<<<<<< HEAD
         return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
+=======
+        return res.redirect('https://agrisistatnce.netlify.app/auth/email-verified-successfully');
+        // return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
+>>>>>>> 132946e119d83d635c49d4a747df5500399424e4
 
     } catch (e) {
   
@@ -224,29 +229,29 @@ const verifyOTP = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     
-        try {
-            const { eMail } = req.body;
-    
-            // Check if the user exists
-            const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
-            const user = rows[0];
-            const user_id = user.user_id;
-    
-            if (!user) {
-                return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
-            }
-    
-            // Create a token and send the email
-            const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '2m' });
-            await sendEmail(eMail, user_id, 'resetPassword');
-    
-            // Send response
-            return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
-    
-        } catch (error) {
-            console.error('Error during forgot password:', error);
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+    try {
+        const { eMail } = req.body;
+
+        // Check if the user exists
+        const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
+        const user = rows[0];
+        const user_id = user.user_id;
+
+        if (!user) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
         }
+
+        // Create a token and send the email
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
+        await sendEmail(eMail, token, 'resetPassword');
+
+        // Send response
+        return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
+
+    } catch (error) {
+        console.error('Error during forgot password:', error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+    }
 };
 
 
@@ -254,10 +259,22 @@ const forgotPassword = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
+<<<<<<< HEAD
     const user_id = req.params.user_id;
     const { newPassword } = req.body;
 
     try {
+=======
+    const token = req.params.token;
+    const { newPassword } = req.body;
+
+    try {
+
+        // Verify the token
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        const user_id = payload.user_id;
+        
+>>>>>>> 132946e119d83d635c49d4a747df5500399424e4
         // Hash the new password and update the user's password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await pool.query('UPDATE Users SET password = ? WHERE user_id = ?', [hashedPassword, user_id]);

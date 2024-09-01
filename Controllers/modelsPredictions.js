@@ -34,7 +34,10 @@ const generateBusinessPlan = async (req, res) => {
 
 const chatBot = async (req, res) => {
   const { message } = req.body;
+<<<<<<< HEAD
   const user_id = req.user.id;
+=======
+>>>>>>> 132946e119d83d635c49d4a747df5500399424e4
 
   try {
 

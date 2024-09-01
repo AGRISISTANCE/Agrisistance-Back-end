@@ -14,6 +14,10 @@ router.get('/register/verify/:token', verifyUserEmail);
 router.post('/verify-otp', validateRequest(validateVerifyOTP), authenticateUser, verifyOTP );
 
 router.post('/forgot-password', validateRequest(validateForgotPassword), forgotPassword);
+<<<<<<< HEAD
 router.put('/reset-password/:user_id', validateRequest(validateResetPassword), resetPassword);
+=======
+router.put('/reset-password/:token', validateRequest(validateResetPassword), resetPassword);
+>>>>>>> 132946e119d83d635c49d4a747df5500399424e4
 
 export default router;
