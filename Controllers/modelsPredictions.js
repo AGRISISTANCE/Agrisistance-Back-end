@@ -57,8 +57,6 @@ const chatBot = async (req, res) => {
 
     const result = data.response.messages[0].content
 
-    console.log(result)
-
     res.status(StatusCodes.OK).json({ result });
 
   }catch (error) {

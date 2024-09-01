@@ -70,7 +70,7 @@ const sendEmail = async (email, token, type) => {
     }else if (type === 'OTPverify'){
       emailHtml = emailTemplate.replace('{{otp}}', token);
     }else if (type === 'resetPassword'){
-      emailHtml = emailTemplate.replace('reset_link', `https://agrisistatnce.netlify.app/reset-password/${token}`);
+      emailHtml = emailTemplate.replace('reset_link', `https://agrisistatnce.netlify.app/auth/reset-password/${token}`);
     }else if (type === 'updateVerification'){
       emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/profile/update-email/verify/${token}`);
     }

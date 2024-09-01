@@ -169,7 +169,7 @@ const verifyUserEmail = async (req, res) => {
     
         // Send the token
         const realToken = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
-        return res.redirect('https://agrisistatnce.netlify.app/auth/login');
+        return res.redirect('https://agrisistatnce.netlify.app/auth/email-verified-successfully');
         // return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
 
     } catch (e) {
@@ -225,29 +225,29 @@ const verifyOTP = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     
-        try {
-            const { eMail } = req.body;
-    
-            // Check if the user exists
-            const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
-            const user = rows[0];
-            const user_id = user.user_id;
-    
-            if (!user) {
-                return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
-            }
-    
-            // Create a token and send the email
-            const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
-            await sendEmail(eMail, token, 'resetPassword');
-    
-            // Send response
-            return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
-    
-        } catch (error) {
-            console.error('Error during forgot password:', error);
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+    try {
+        const { eMail } = req.body;
+
+        // Check if the user exists
+        const [rows] = await pool.query('SELECT * FROM Users WHERE eMail = ?', [eMail]);
+        const user = rows[0];
+        const user_id = user.user_id;
+
+        if (!user) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid email' });
         }
+
+        // Create a token and send the email
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+        await sendEmail(eMail, token, 'resetPassword');
+
+        // Send response
+        return res.status(StatusCodes.OK).json({ message: 'Reset password link sent to your email' });
+
+    } catch (error) {
+        console.error('Error during forgot password:', error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+    }
 };
 
 
