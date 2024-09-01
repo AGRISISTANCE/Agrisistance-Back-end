@@ -37,7 +37,7 @@ const register = async (req, res) => {
         await pool.query(sql, [user_id, firstName, lastName, country, phoneNumber, eMail, hashedPassword]);
 
         // Create a token
-        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+        const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
 
         // Send confirmation email
         await sendEmail(eMail, token, 'confirmation');
@@ -85,7 +85,7 @@ const login = async (req, res) => {
         if (user.isVerified === 'FALSE') {
             
             // Send confirmation email again
-            const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+            const token = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
             await sendEmail(user.eMail, token, 'confirmation');
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Please verify your email' });
         }
@@ -132,7 +132,7 @@ const login = async (req, res) => {
         // Send it via email instead
         await sendEmail(user.eMail, randomNumber, 'OTPverify'); 
         console.log(`Generated number for : ${randomNumber}`);
-        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
 
         return res.status(StatusCodes.OK).json({
             msg : "number generated",
@@ -238,7 +238,7 @@ const forgotPassword = async (req, res) => {
         }
 
         // Create a token and send the email
-        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+        const token = jwt.sign({ user_id: user_id }, process.env.JWT_SECRET, { expiresIn: '10m' });
         await sendEmail(eMail, token, 'resetPassword');
 
         // Send response

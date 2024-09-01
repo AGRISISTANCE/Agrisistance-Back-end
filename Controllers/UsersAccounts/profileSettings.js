@@ -79,7 +79,7 @@ const updateEmail = async (req, res) => {
     }
 
     // Send a verification E-mail
-    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '5m' });
+    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '10m' });
     await sendEmail(eMail, token, 'updateVerification');
     
     res.status(StatusCodes.OK).json({ message: 'Verification email sent' });
