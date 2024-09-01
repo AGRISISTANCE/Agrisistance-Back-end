@@ -79,7 +79,7 @@ const updateEmail = async (req, res) => {
     }
 
     // Send a verification E-mail
-    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '5m' });
+    const token = jwt.sign({ user_id, eMail }, process.env.JWT_SECRET, { expiresIn: '10m' });
     await sendEmail(eMail, token, 'updateVerification');
     
     res.status(StatusCodes.OK).json({ message: 'Verification email sent' });
@@ -104,7 +104,7 @@ const verifyUpdateEmail = async (req, res) => {
         const date = new Date(currentTimestamp);
         await pool.query('INSERT INTO history VALUES (?, ?, ?, ?)',[action_id, user_id, 'Update Email', date]);
 
-        return res.redirect('http://localhost:3000/auth/login');
+        return res.redirect('https://agrisistatnce.netlify.app/dashboard/profile/email-updated-successfully');
         // res.status(StatusCodes.OK).json({ message: 'Email updated successfully' });
     } catch (error) {
         console.error(error);
