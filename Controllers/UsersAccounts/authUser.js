@@ -169,12 +169,8 @@ const verifyUserEmail = async (req, res) => {
     
         // Send the token
         const realToken = jwt.sign({ user_id }, process.env.JWT_SECRET, { expiresIn: '10d' });
-<<<<<<< HEAD
-        return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
-=======
         return res.redirect('https://agrisistatnce.netlify.app/auth/email-verified-successfully');
         // return res.status(StatusCodes.ACCEPTED).json({ token : realToken}); // TODO : Should be a redirection to the home page here 
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
 
     } catch (e) {
   
@@ -259,12 +255,6 @@ const forgotPassword = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-<<<<<<< HEAD
-    const user_id = req.params.user_id;
-    const { newPassword } = req.body;
-
-    try {
-=======
     const token = req.params.token;
     const { newPassword } = req.body;
 
@@ -274,7 +264,6 @@ const resetPassword = async (req, res) => {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         const user_id = payload.user_id;
         
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
         // Hash the new password and update the user's password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await pool.query('UPDATE Users SET password = ? WHERE user_id = ?', [hashedPassword, user_id]);

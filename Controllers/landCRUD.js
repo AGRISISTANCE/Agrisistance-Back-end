@@ -129,15 +129,11 @@ const updateLand = async (req, res) => {
 
     //TODO : predict again
 
-<<<<<<< HEAD
-    res.status(StatusCodes.OK).json({ message: 'Land updated successfully' });
-=======
     res.status(StatusCodes.OK)
     .json({ message: 'Land updated successfully', 
       land_id : land_id , 
       //businessplan : response
     });
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
   
   } catch (error) {
 
@@ -164,11 +160,7 @@ const getLandbyID = async (req, res) => {
       pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
       pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
       pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]),
-<<<<<<< HEAD
-      pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id])
-=======
       pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id])
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
     ]);*/
 
     const weather = await pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]);
@@ -176,13 +168,9 @@ const getLandbyID = async (req, res) => {
     const land = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
     const land_statistics = await pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]);
     const crop_maintenance = await pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]);
-<<<<<<< HEAD
-    const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
-=======
     const finance = await pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id]);
 
     const business_plan = await pool.query('SELECT * FROM Business_Plans WHERE land_id = ?', [land_id]);
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
 
     // Return the data in JSON format
     res.status(StatusCodes.OK).json({
@@ -191,12 +179,8 @@ const getLandbyID = async (req, res) => {
       crop_maintenance: crop_maintenance[0],
       weather: weather[0],
       land_statistics: land_statistics[0],
-<<<<<<< HEAD
-      finance: finance[0]
-=======
       finance: finance[0],
       business_plan: business_plan[0],
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
     });
 
   } catch (error) {
@@ -243,11 +227,7 @@ const deleteLand = async (req, res) => {
 
     // Check if there is an image to delete
     const [result] = await pool.query('SELECT land_image FROM Land_Data WHERE land_id = ?', [land_id]);
-<<<<<<< HEAD
-    if (result[0].land_image) {
-=======
     if (result[0].land_image !== null) {
->>>>>>> 132946e119d83d635c49d4a747df5500399424e4
       const publicId = extractPublicId(userRows[0].profile_picture);
       if (publicId) {
           await deleteImageFromCloudinary(publicId, 'Land-Pictures');
