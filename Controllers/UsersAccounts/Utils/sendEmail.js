@@ -66,13 +66,13 @@ const sendEmail = async (email, token, type) => {
     
     // Edit E-mails by injection variables
     if (type === 'confirmation'){
-      emailHtml = emailTemplate.replace('verification_link', `http://localhost:8081/api/auth/register/verify/${token}`);
+      emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/auth/register/verify/${token}`);
     }else if (type === 'OTPverify'){
       emailHtml = emailTemplate.replace('{{otp}}', token);
     }else if (type === 'resetPassword'){
       emailHtml = emailTemplate.replace('reset_link', `https://agrisistatnce.netlify.app/auth/reset-password/${token}`);
     }else if (type === 'updateVerification'){
-      emailHtml = emailTemplate.replace('verification_link', `http://127.0.0.1:8081/api/profile/update-email/verify/${token}`);
+      emailHtml = emailTemplate.replace('verification_link', `https://agrisistance-server.onrender.com/api/profile/update-email/verify/${token}`);
     }
 
     const mailOptions = {

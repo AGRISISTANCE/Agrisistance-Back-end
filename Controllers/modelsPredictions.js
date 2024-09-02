@@ -12,7 +12,7 @@ const generateBusinessPlan = async (req, res) => {
     const user_id = req.user.id;
 
     // Send the model inputs to the FastAPI server
-    const response = await axios.post('http://localhost:8000/generate-business-plan', {land_id});
+    const response = await axios.post('https://agrisistance-model-backend.onrender.com/generate-business-plan', {land_id});
 
 
     // Update history
@@ -37,7 +37,7 @@ const chatBot = async (req, res) => {
 
   try {
 
-    const response = await fetch('http://localhost:8000/chat', {  // Adjust the URL if needed
+    const response = await fetch('https://agrisistance-model-backend.onrender.com/chat', {  // Adjust the URL if needed
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'

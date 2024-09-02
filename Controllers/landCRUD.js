@@ -119,7 +119,7 @@ const updateLand = async (req, res) => {
     await pool.query (`UPDATE Financial_Data SET investment_amount = ? WHERE land_id = ?`, [budget, land_id]);
     await pool.query (`UPDATE Weather_Data SET humidity = ? WHERE land_id = ?`, [humidity, land_id]);
 
-    //const response = await axios.post('http://localhost:8000/generate-business-plan', {land_id});
+    const response = await axios.post('https://agrisistance-model-backend.onrender.com/generate-business-plan', {land_id});
 
     // Update history
     const actions_id = uuidv4();
@@ -132,7 +132,7 @@ const updateLand = async (req, res) => {
     res.status(StatusCodes.OK)
     .json({ message: 'Land updated successfully', 
       land_id : land_id , 
-      //businessplan : response
+      businessplan : response
     });
   
   } catch (error) {
@@ -153,16 +153,8 @@ const getLandbyID = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    // Fetch data concurrently from multiple tables
-    /*const [weather, crop_types, land, land_statistics,crop_maintenance, finance] = await Promise.all([
-      pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]),
-      pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]),
-      pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]),
-      pool.query('SELECT * FROM Land_Statistics WHERE land_id = ?', [land_id]),
-      pool.query('SELECT * FROM Crop_Maintenance WHERE land_id = ?', [land_id]),
-      pool.query('SELECT * FROM Financial_Data WHERE land_id = ?', [land_id])
-    ]);*/
 
+    // Fetch data concurrently from multiple tables
     const weather = await pool.query('SELECT * FROM Weather_Data WHERE land_id = ?', [land_id]);
     const crop_types = await pool.query('SELECT * FROM Crop_Data WHERE land_id = ?', [land_id]);
     const land = await pool.query('SELECT * FROM Land_Data WHERE land_id = ? AND user_id = ?', [land_id, user_id]);
