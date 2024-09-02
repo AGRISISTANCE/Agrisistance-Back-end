@@ -32,7 +32,7 @@ const editProfile = async (req, res) => {
     try {
 
         // Update user profile
-        const sql = 'UPDATE Users SET firstName = ?, lastName = ?, country = ? phoneNumber = ? WHERE user_id = ?';
+        const sql = 'UPDATE Users SET firstName = ?, lastName = ?, country = ?, phoneNumber = ? WHERE user_id = ?';
         await pool.query(sql, [firstName, lastName, country, phoneNumber, user_id]);
 
         // Update history
