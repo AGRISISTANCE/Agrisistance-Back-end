@@ -1,5 +1,5 @@
 import { pool, deletion_pool } from '../DB/connect.js';
-import sendEmail from '../Controllers/UsersAccounts/Utils/sendEmail.js';
+import sendEmail from '../Controllers/Utils/sendEmail.js';
 
 
 const deleteUserAccountsCronJob = async () => {
@@ -17,41 +17,38 @@ const deleteUserAccountsCronJob = async () => {
           continue;
         }
   
-        // Delete the user account and his data
-        
+        // Delete the user account and his data    
         const [history, financial_data, yield_predictions, crop_types, pest_data, recommendations, weather_data, land_data, users ] = await Promise.all([
           pool.query('SELECT * FROM history WHERE user_id = ?', [user.user_id]),
           pool.query('SELECT * FROM financial_data WHERE user_id = ?', [user.user_id]),
-          pool.query('SELECT * FROM yield_predictions WHERE user_id = ?', [user.user_id]),
-          pool.query('SELECT * FROM crop_types WHERE user_id = ?', [user.user_id]),
-          pool.query('SELECT * FROM pest_data WHERE user_id = ?', [user.user_id]),
-          pool.query('SELECT * FROM recommendations WHERE user_id = ?', [user.user_id]),
           pool.query('SELECT * FROM weather_data WHERE user_id = ?', [user.user_id]),
+          pool.query('SELECT * FROM crop_types WHERE user_id = ?', [user.user_id]),
+          pool.query('SELECT * FROM crop_maintenance WHERE user_id = ?', [user.user_id]),      
+          pool.query('SELECT * FROM land_statistics WHERE user_id = ?', [user.user_id]),
           pool.query('SELECT * FROM land_data WHERE user_id = ?', [user.user_id]),
           pool.query('SELECT * FROM users WHERE user_id = ?', [user.user_id])
       ]);
 
+        // Insert the deleted data into the deletion database
         await Promise.all([
-          deletion_pool.query('INSERT INTO history_deleted VALUES ?', [history]),
-          deletion_pool.query('INSERT INTO financial_data_deleted VALUES ?', [financial_data]),
-          deletion_pool.query('INSERT INTO yield_predictions_deleted VALUES ?', [yield_predictions]),
+          deletion_pool.query('INSERT INTO history VALUES ?', [history]),
+          deletion_pool.query('INSERT INTO finanical_data VALUES ?', [financial_data]),
+          deletion_pool.query('INSERT INTO crop_maintenance VALUES ?', [yield_predictions]),
           deletion_pool.query('INSERT INTO crop_types_deleted VALUES ?', [crop_types]),
-          deletion_pool.query('INSERT INTO pest_data_deleted VALUES ?', [pest_data]),
-          deletion_pool.query('INSERT INTO recommendations_deleted VALUES ?', [recommendations]),
-          deletion_pool.query('INSERT INTO weather_data_deleted VALUES ?', [weather_data]),
-          deletion_pool.query('INSERT INTO land_data_deleted VALUES ?', [land_data]),
-          deletion_pool.query('INSERT INTO users_deleted VALUES ?', [users])
+          deletion_pool.query('INSERT INTO land_statistics VALUES ?', [recommendations]),
+          deletion_pool.query('INSERT INTO weather_data VALUES ?', [weather_data]),
+          deletion_pool.query('INSERT INTO land_data VALUES ?', [land_data]),
+          deletion_pool.query('INSERT INTO users VALUES ?', [users])
       ]);
 
 
         await Promise.all([
           pool.query('DELETE FROM history WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM financial_data WHERE user_id = ?', [user.user_id]),
-          pool.query('DELETE FROM yield_predictions WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM crop_maintenance WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM crop_types WHERE user_id = ?', [user.user_id]),
-          pool.query('DELETE FROM pest_data WHERE user_id = ?', [user.user_id]),
-          pool.query('DELETE FROM recommendations WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM weather_data WHERE user_id = ?', [user.user_id]),
+          pool.query('DELETE FROM land_statistics WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM land_data WHERE user_id = ?', [user.user_id]),
           pool.query('DELETE FROM users WHERE user_id = ?', [user.user_id])
       ]);

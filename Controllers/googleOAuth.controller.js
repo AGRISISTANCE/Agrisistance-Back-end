@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import {pool} from '../../DB/connect.js';
+import {pool} from '../DB/connect.js';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';

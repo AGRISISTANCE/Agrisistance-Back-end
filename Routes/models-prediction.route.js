@@ -1,5 +1,5 @@
 import express from 'express';
-import { generateBusinessPlan, chatBot } from '../Controllers/modelsPredictions.js';
+import { generateBusinessPlan, chatBot } from '../Controllers/models-predictions.controller.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();

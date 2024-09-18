@@ -1,5 +1,5 @@
 import express from 'express';
-import { addLand, updateLand, getLandbyID, getAllLands, deleteLand } from '../Controllers/landCRUD.js';
+import { addLand, updateLand, getLandbyID, getAllLands, deleteLand } from '../Controllers/land.controller.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();

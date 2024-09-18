@@ -1,10 +1,13 @@
 import express from 'express';
-import { updatePassword, updateEmail, verifyUpdateEmail, completeAccount, unable2FA, UploadPFP, UpdateSubscription } from '../../Controllers/UsersAccounts/profileSettings.js';
-import authenticateUser from '../../Middleware/authMiddleware.js';
-import { validateRequest,validateCompleteAccount,validateUnable2FA, validateUpdateEmail, validateUploadPFP,validateUpdatePassword, validateUpdateSubscriptionType } from '../../Middleware/validationMiddleware.js';
+import { getProfile, editProfile, deleteProfile, updatePassword, updateEmail, verifyUpdateEmail, completeAccount, unable2FA, UploadPFP, UpdateSubscription } from '../Controllers/profile.controller.js';
+import authenticateUser from '../Middleware/authMiddleware.js';
+import { validateRequest, validateEditProfile, validateCompleteAccount,validateUnable2FA, validateUpdateEmail, validateUploadPFP,validateUpdatePassword, validateUpdateSubscriptionType } from '../Middleware/validationMiddleware.js';
 
 const router = express.Router();
 
+router.get('/get-profile', authenticateUser, getProfile);
+router.put('/edit-profile', validateRequest(validateEditProfile), authenticateUser, editProfile);
+router.delete('/delete-profile', authenticateUser, deleteProfile);
 
 router.put('/update-password', validateRequest(validateUpdatePassword), authenticateUser, updatePassword);
 

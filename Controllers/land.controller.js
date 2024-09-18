@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {pool} from '../DB/connect.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { StatusCodes } from 'http-status-codes';
-import { extractPublicId, deleteImageFromCloudinary } from './UsersAccounts/Utils/cloudinaryDelete.js';
+import { extractPublicId, deleteImageFromCloudinary } from './Utils/cloudinaryDelete.js';
 
 dotenv.config();
 

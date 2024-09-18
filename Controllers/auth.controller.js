@@ -3,7 +3,7 @@ import twilio from 'twilio';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import {pool} from '../../DB/connect.js';
+import {pool} from '../DB/connect.js';
 import sendEmail from './Utils/sendEmail.js';
 import { StatusCodes } from 'http-status-codes';
 import randomNumbers from './Utils/randomNumbers.js'

@@ -11,7 +11,7 @@ import notFoundMiddleware from './Middleware/not-found.js';
 import errorHandlerMiddleware from './Middleware/error-handler.js';
 
 import routes from './Routes/index.js';
-import './Util/scheduler.js';
+import './events/scheduler.js';
 
 
 const app = express();

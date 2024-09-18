@@ -1,8 +1,8 @@
 import express from 'express';
-import { register, login, verifyUserEmail, verifyOTP, forgotPassword, resetPassword } from '../../Controllers/UsersAccounts/authUser.js';
-import { validateRequest ,validateRegister , validateLogin, validateVerifyOTP, validateForgotPassword, validateResetPassword } from '../../Middleware/validationMiddleware.js';
+import { register, login, verifyUserEmail, verifyOTP, forgotPassword, resetPassword } from '../Controllers/auth.controller.js';
+import { validateRequest ,validateRegister , validateLogin, validateVerifyOTP, validateForgotPassword, validateResetPassword } from '../Middleware/validationMiddleware.js';
 
-import authenticateUser from '../../Middleware/authMiddleware.js';
+import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
